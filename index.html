@@ -10,6 +10,7 @@
     <title>🎓 English Fun - Friends Plus 8</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=pVAluRyih"></script>
     <style>
         :root{--primary:#6C5CE7;--primary-dark:#5A4BD1;--secondary:#FD79A8;--accent:#FDCB6E;--success:#00B894;--danger:#E17055;--info:#0984E3;--bg-gradient:linear-gradient(135deg,#6C5CE7 0%,#A29BFE 40%,#FD79A8 100%);--card-bg:rgba(255,255,255,0.97);--text-dark:#2D3436;--text-light:#636E72;--shadow-sm:0 2px 8px rgba(0,0,0,.08);--shadow-md:0 8px 24px rgba(0,0,0,.12);--shadow-lg:0 16px 48px rgba(0,0,0,.16);--shadow-glow:0 0 30px rgba(108,92,231,.3);--radius:20px;--radius-sm:12px}
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -715,25 +716,71 @@ function toggleVietnamese(show){
 (function(){const v=localStorage.getItem('showVi');if(v==='0'){document.body.classList.add('hide-vi');const cb=document.querySelector('.vi-toggle input');if(cb)cb.checked=false}})();
 
 // ===== SPEECH =====
-let speechRate=0.85,currentUtterance=null;
-const hasSpeech=(typeof window!=='undefined'&&'speechSynthesis' in window&&window.speechSynthesis!=null);
-function stopSpeech(){try{if(hasSpeech)window.speechSynthesis.cancel()}catch(e){}}
-function speak(text,btn,onEnd){
-    if(!hasSpeech){showToast('Trình duyệt không hỗ trợ phát âm');if(onEnd)onEnd();return}
+let speechRate=0.85,currentUtterance=null,currentAudio=null;
+var hasRV=(typeof responsiveVoice!=='undefined');
+var hasSpeech=(typeof window!=='undefined'&&'speechSynthesis' in window&&window.speechSynthesis!=null);
+
+function stopSpeech(){
+    try{if(hasRV)responsiveVoice.cancel()}catch(e){}
+    try{if(hasSpeech)window.speechSynthesis.cancel()}catch(e){}
+    try{if(currentAudio){currentAudio.pause();currentAudio.currentTime=0;currentAudio=null}}catch(e){}
+    document.querySelectorAll('.speak-btn.speaking').forEach(function(b){b.classList.remove('speaking')});
+}
+
+// Layer 3: Google Translate TTS (last resort)
+function speakWithGoogleTTS(text,btn,onEnd){
     try{
-    stopSpeech();
-    document.querySelectorAll('.speak-btn.speaking').forEach(b=>b.classList.remove('speaking'));
-    const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=speechRate;u.pitch=1;
-    const voices=window.speechSynthesis.getVoices();
-    const v=voices.find(v=>v.lang.startsWith('en')&&v.name.includes('Female'))||voices.find(v=>v.lang.startsWith('en-US'))||voices.find(v=>v.lang.startsWith('en'));
-    if(v)u.voice=v;
-    if(btn){btn.classList.add('speaking')}
-    u.onend=()=>{if(btn)btn.classList.remove('speaking');if(onEnd)onEnd()};
-    u.onerror=()=>{if(btn)btn.classList.remove('speaking');if(onEnd)onEnd()};
-    window.speechSynthesis.speak(u);currentUtterance=u;
+        var shortText=text.substring(0,200);
+        var url='https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q='+encodeURIComponent(shortText);
+        var audio=new Audio(url);
+        currentAudio=audio;
+        if(btn)btn.classList.add('speaking');
+        audio.onended=function(){if(btn)btn.classList.remove('speaking');currentAudio=null;if(onEnd)onEnd()};
+        audio.onerror=function(){if(btn)btn.classList.remove('speaking');currentAudio=null;if(onEnd)onEnd()};
+        audio.play().catch(function(){if(btn)btn.classList.remove('speaking');currentAudio=null;if(onEnd)onEnd()});
     }catch(e){if(btn)btn.classList.remove('speaking');if(onEnd)onEnd()}
 }
-if(hasSpeech){try{window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices()}catch(e){}}
+
+// Layer 2: Browser speechSynthesis
+function speakWithBrowser(text,btn,onEnd){
+    if(!hasSpeech){speakWithGoogleTTS(text,btn,onEnd);return}
+    try{
+        var u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=speechRate;u.pitch=1;
+        var voices=window.speechSynthesis.getVoices();
+        var v=voices.find(function(v){return v.lang.startsWith('en')&&v.name.includes('Female')})||voices.find(function(v){return v.lang.startsWith('en-US')})||voices.find(function(v){return v.lang.startsWith('en')});
+        if(v)u.voice=v;
+        if(btn)btn.classList.add('speaking');
+        u.onend=function(){if(btn)btn.classList.remove('speaking');if(onEnd)onEnd()};
+        u.onerror=function(){if(btn)btn.classList.remove('speaking');speakWithGoogleTTS(text,btn,onEnd)};
+        window.speechSynthesis.speak(u);currentUtterance=u;
+    }catch(e){speakWithGoogleTTS(text,btn,onEnd)}
+}
+
+// Layer 1: ResponsiveVoice (primary - best quality)
+function speak(text,btn,onEnd){
+    stopSpeech();
+    if(btn)btn.classList.add('speaking');
+    if(hasRV){
+        try{
+            responsiveVoice.speak(text,"US English Female",{
+                rate:speechRate,
+                onend:function(){if(btn)btn.classList.remove('speaking');if(onEnd)onEnd()},
+                onerror:function(){if(btn)btn.classList.remove('speaking');speakWithBrowser(text,btn,onEnd)}
+            });
+        }catch(e){speakWithBrowser(text,btn,onEnd)}
+    }else{
+        speakWithBrowser(text,btn,onEnd);
+    }
+}
+
+// Init voices
+if(hasSpeech){try{window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices()}}catch(e){}}
+// Check RV loaded after delay
+setTimeout(function(){hasRV=(typeof responsiveVoice!=='undefined')},2000);
+
+// Safe speak from data attribute - avoids inline quote escaping issues
+function speakData(btn){var t=btn.getAttribute('data-speak');if(t)speak(t,btn)}
+function speakDataStop(btn){event.stopPropagation();speakData(btn)}
 
 // ===== SOUND FX =====
 let audioCtx;
@@ -755,14 +802,14 @@ function addShadowCount(w){const d=JSON.parse(localStorage.getItem('shadowCounts
 // ===== DATA =====
 const unitsData={
 starter:{title:"Starter Unit",subtitle:"Ôn tập kiến thức cơ bản",lessons:[{icon:"🔤",title:"Vocabulary Review",desc:"Ôn tập từ vựng lớp 7",status:"📖"},{icon:"📐",title:"Grammar Review",desc:"Present, Past, Future tenses",status:"📖"},{icon:"🎧",title:"Listening Practice",desc:"Luyện nghe cơ bản",status:"📖"},{icon:"✍️",title:"Writing Skills",desc:"Kỹ năng viết cơ bản",status:"📖"}],grammar:{title:"📐 Grammar Review",content:"Ôn tập các thì: Present Simple, Present Continuous, Past Simple",example:"I study English every day.|I am studying now."}},
-unit1:{title:"Unit 1: Fads and Fashions",subtitle:"Xu hướng & Thời trang",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Fashion & clothing items",status:"📖"},{icon:"📖",title:"Reading",desc:"Fashion trends through history",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Past Simple & Past Continuous",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Shopping for clothes",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Used to",status:"📖"},{icon:"💬",title:"Speaking",desc:"Discussing fashion",status:"📖"},{icon:"✍️",title:"Writing",desc:"A description of a photo",status:"📖"}],grammar:{title:"📐 Past Simple vs Past Continuous",content:"Past Simple: hành động hoàn thành trong quá khứ<br>Past Continuous: hành động đang diễn ra tại thời điểm trong quá khứ",example:"While I was walking, I met an old friend."}},
-unit2:{title:"Unit 2: Sensations",subtitle:"Cảm giác & Giác quan",lessons:[{icon:"🔤",title:"Vocabulary",desc:"The five senses",status:"📖"},{icon:"📖",title:"Reading",desc:"Sensory experiences",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Adjectives -ed/-ing",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Describing feelings",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Comparative & Superlative",status:"📖"},{icon:"💬",title:"Speaking",desc:"Expressing opinions",status:"📖"},{icon:"✍️",title:"Writing",desc:"A review",status:"📖"}],grammar:{title:"📐 Adjectives: -ed vs -ing",content:"-ed: cảm xúc của người (how you feel)<br>-ing: đặc điểm của vật/việc (what causes the feeling)",example:"I am bored.|This film is boring."}},
-unit3:{title:"Unit 3: Adventure",subtitle:"Phiêu lưu & Khám phá",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Adventure activities",status:"📖"},{icon:"📖",title:"Reading",desc:"Extreme sports",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Present Perfect",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Travel experiences",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Present Perfect vs Past Simple",status:"📖"},{icon:"💬",title:"Speaking",desc:"Talking about experiences",status:"📖"},{icon:"✍️",title:"Writing",desc:"A blog post",status:"📖"}],grammar:{title:"📐 Present Perfect",content:"Cấu trúc: have/has + V3 (past participle)<br>Dùng để nói về trải nghiệm, hành động vừa xảy ra",example:"I have visited Paris twice."}},
-unit4:{title:"Unit 4: Material World",subtitle:"Thế giới vật chất",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Materials & products",status:"📖"},{icon:"📖",title:"Reading",desc:"Consumerism",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Quantifiers",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Money & spending",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"First Conditional",status:"📖"},{icon:"💬",title:"Speaking",desc:"Negotiating",status:"📖"},{icon:"✍️",title:"Writing",desc:"A formal email",status:"📖"}],grammar:{title:"📐 First Conditional",content:"Cấu trúc: If + Present Simple, will + V<br>Tình huống có thể xảy ra trong tương lai",example:"If it rains, I will stay home."}},
-unit5:{title:"Unit 5: Years Ahead",subtitle:"Những năm phía trước",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Future plans",status:"📖"},{icon:"📖",title:"Reading",desc:"Life in the future",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Will vs Going to",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Career aspirations",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Future time clauses",status:"📖"},{icon:"💬",title:"Speaking",desc:"Making predictions",status:"📖"},{icon:"✍️",title:"Writing",desc:"An essay about future",status:"📖"}],grammar:{title:"📐 Will vs Going to",content:"Will: dự đoán, quyết định tức thời<br>Going to: kế hoạch đã định, dự đoán có bằng chứng",example:"I think it will rain.|Look! It is going to rain."}},
-unit6:{title:"Unit 6: Learn",subtitle:"Học tập & Giáo dục",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Education & school",status:"📖"},{icon:"📖",title:"Reading",desc:"Learning styles",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Must, have to",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Study habits",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Should, ought to",status:"📖"},{icon:"💬",title:"Speaking",desc:"Giving advice",status:"📖"},{icon:"✍️",title:"Writing",desc:"A letter of advice",status:"📖"}],grammar:{title:"📐 Modal Verbs",content:"Must/Have to: bắt buộc<br>Should/Ought to: lời khuyên",example:"You must wear a uniform.|You should study harder."}},
-unit7:{title:"Unit 7: Big Ideas",subtitle:"Ý tưởng lớn & Phát minh",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Inventions",status:"📖"},{icon:"📖",title:"Reading",desc:"Famous inventors",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Passive (Present)",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Technology",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Passive (Past)",status:"📖"},{icon:"💬",title:"Speaking",desc:"Describing processes",status:"📖"},{icon:"✍️",title:"Writing",desc:"A process description",status:"📖"}],grammar:{title:"📐 Passive Voice",content:"Cấu trúc: be + V3 (past participle)<br>Dùng khi không biết/không quan trọng ai làm",example:"The telephone was invented by Bell."}},
-unit8:{title:"Unit 8: On Screen",subtitle:"Phim & Truyền hình",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Films & TV genres",status:"📖"},{icon:"📖",title:"Reading",desc:"Book or film?",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Reported speech: statements",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Movie reviews",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Reported speech: questions",status:"📖"},{icon:"💬",title:"Speaking",desc:"Discussing films",status:"📖"},{icon:"✍️",title:"Writing",desc:"A film review",status:"📖"}],grammar:{title:"📐 Reported Speech",content:"Chuyển lời nói trực tiếp sang gián tiếp, lùi thì",example:"She said she loved that movie."}}
+unit1:{title:"Unit 1: Fads and Fashions",subtitle:"Xu hướng & Thời trang",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Fashion & clothing items",status:"📖"},{icon:"📖",title:"Reading",desc:"Fashion trends through history",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Past Simple & Past Continuous",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Shopping for clothes",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Used to",status:"📖"},{icon:"💬",title:"Speaking",desc:"Discussing fashion",status:"📖"},{icon:"✍️",title:"Writing",desc:"A description of a photo",status:"📖"},{icon:"📖",title:"Reading 2",desc:"TikTok and fast trends",status:"📖"},{icon:"📖",title:"Reading 3",desc:"School uniforms debate",status:"📖"}],grammar:{title:"📐 Past Simple vs Past Continuous",content:"Past Simple: hành động hoàn thành trong quá khứ<br>Past Continuous: hành động đang diễn ra tại thời điểm trong quá khứ",example:"While I was walking, I met an old friend."}},
+unit2:{title:"Unit 2: Sensations",subtitle:"Cảm giác & Giác quan",lessons:[{icon:"🔤",title:"Vocabulary",desc:"The five senses",status:"📖"},{icon:"📖",title:"Reading",desc:"Sensory experiences",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Adjectives -ed/-ing",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Describing feelings",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Comparative & Superlative",status:"📖"},{icon:"💬",title:"Speaking",desc:"Expressing opinions",status:"📖"},{icon:"✍️",title:"Writing",desc:"A review",status:"📖"},{icon:"📖",title:"Reading 2",desc:"Music and goosebumps",status:"📖"}],grammar:{title:"📐 Adjectives: -ed vs -ing",content:"-ed: cảm xúc của người (how you feel)<br>-ing: đặc điểm của vật/việc (what causes the feeling)",example:"I am bored.|This film is boring."}},
+unit3:{title:"Unit 3: Adventure",subtitle:"Phiêu lưu & Khám phá",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Adventure activities",status:"📖"},{icon:"📖",title:"Reading",desc:"Extreme sports",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Present Perfect",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Travel experiences",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Present Perfect vs Past Simple",status:"📖"},{icon:"💬",title:"Speaking",desc:"Talking about experiences",status:"📖"},{icon:"✍️",title:"Writing",desc:"A blog post",status:"📖"},{icon:"📖",title:"Reading 2",desc:"Lost in the Amazon",status:"📖"},{icon:"📖",title:"Reading 3",desc:"A teen on Everest",status:"📖"}],grammar:{title:"📐 Present Perfect",content:"Cấu trúc: have/has + V3 (past participle)<br>Dùng để nói về trải nghiệm, hành động vừa xảy ra",example:"I have visited Paris twice."}},
+unit4:{title:"Unit 4: Material World",subtitle:"Thế giới vật chất",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Materials & products",status:"📖"},{icon:"📖",title:"Reading",desc:"Consumerism",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Quantifiers",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Money & spending",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"First Conditional",status:"📖"},{icon:"💬",title:"Speaking",desc:"Negotiating",status:"📖"},{icon:"✍️",title:"Writing",desc:"A formal email",status:"📖"},{icon:"📖",title:"Reading 2",desc:"The Queen of Recycling",status:"📖"},{icon:"📖",title:"Reading 3",desc:"Your phone true cost",status:"📖"}],grammar:{title:"📐 First Conditional",content:"Cấu trúc: If + Present Simple, will + V<br>Tình huống có thể xảy ra trong tương lai",example:"If it rains, I will stay home."}},
+unit5:{title:"Unit 5: Years Ahead",subtitle:"Những năm phía trước",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Future plans",status:"📖"},{icon:"📖",title:"Reading",desc:"Life in the future",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Will vs Going to",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Career aspirations",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Future time clauses",status:"📖"},{icon:"💬",title:"Speaking",desc:"Making predictions",status:"📖"},{icon:"✍️",title:"Writing",desc:"An essay about future",status:"📖"},{icon:"📖",title:"Reading 2",desc:"Jobs disappearing by 2040",status:"📖"},{icon:"📖",title:"Reading 3",desc:"Living on Mars",status:"📖"}],grammar:{title:"📐 Will vs Going to",content:"Will: dự đoán, quyết định tức thời<br>Going to: kế hoạch đã định, dự đoán có bằng chứng",example:"I think it will rain.|Look! It is going to rain."}},
+unit6:{title:"Unit 6: Learn",subtitle:"Học tập & Giáo dục",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Education & school",status:"📖"},{icon:"📖",title:"Reading",desc:"Learning styles",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Must, have to",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Study habits",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Should, ought to",status:"📖"},{icon:"💬",title:"Speaking",desc:"Giving advice",status:"📖"},{icon:"✍️",title:"Writing",desc:"A letter of advice",status:"📖"},{icon:"📖",title:"Reading 2",desc:"Gaming helps learn English",status:"📖"},{icon:"📖",title:"Reading 3",desc:"Finnish school system",status:"📖"}],grammar:{title:"📐 Modal Verbs",content:"Must/Have to: bắt buộc<br>Should/Ought to: lời khuyên",example:"You must wear a uniform.|You should study harder."}},
+unit7:{title:"Unit 7: Big Ideas",subtitle:"Ý tưởng lớn & Phát minh",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Inventions",status:"📖"},{icon:"📖",title:"Reading",desc:"Famous inventors",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Passive (Present)",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Technology",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Passive (Past)",status:"📖"},{icon:"💬",title:"Speaking",desc:"Describing processes",status:"📖"},{icon:"✍️",title:"Writing",desc:"A process description",status:"📖"},{icon:"📖",title:"Reading 2",desc:"Ocean Cleanup teen",status:"📖"},{icon:"📖",title:"Reading 3",desc:"Dyson failure to success",status:"📖"}],grammar:{title:"📐 Passive Voice",content:"Cấu trúc: be + V3 (past participle)<br>Dùng khi không biết/không quan trọng ai làm",example:"The telephone was invented by Bell."}},
+unit8:{title:"Unit 8: On Screen",subtitle:"Phim & Truyền hình",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Films & TV genres",status:"📖"},{icon:"📖",title:"Reading",desc:"Book or film?",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Reported speech: statements",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Movie reviews",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Reported speech: questions",status:"📖"},{icon:"💬",title:"Speaking",desc:"Discussing films",status:"📖"},{icon:"✍️",title:"Writing",desc:"A film review",status:"📖"},{icon:"📖",title:"Reading 2",desc:"K-Drama fever worldwide",status:"📖"},{icon:"📖",title:"Reading 3",desc:"AI vs actors in movies",status:"📖"}],grammar:{title:"📐 Reported Speech",content:"Chuyển lời nói trực tiếp sang gián tiếp, lùi thì",example:"She said she loved that movie."}}
 };
 
 const quizData={
@@ -892,7 +939,7 @@ function openUnit(id){
     if(u.grammar){
         const exs=u.grammar.example.split('|');
         c+=`<div class="grammar-box"><h4>${u.grammar.title}</h4><p>${u.grammar.content}</p>`;
-        exs.forEach(ex=>{c+=`<div class="example"><span class="example-text">📝 ${ex}</span><button class="speak-btn small" onclick="event.stopPropagation();speak('${ex.replace(/'/g,"\\'")}',this)">🔊</button></div>`});
+        exs.forEach(ex=>{c+=`<div class="example"><span class="example-text">📝 ${ex}</span><button class="speak-btn small" data-speak="${ex}" onclick="speakDataStop(this)">🔊</button></div>`});
         c+='</div>';
     }
     c+=`<div class="quiz-nav"><button class="quiz-btn primary" onclick="closeModal();startQuiz('grammar')">🎯 Làm bài tập (30 câu)</button></div>`;
@@ -955,9 +1002,9 @@ function openVocab(topic){
         const cnt=getShadowCount(v.word);
         c+=`<div class="vocab-card-wrapper"><div class="vocab-card" onclick="this.classList.toggle('flipped')">
             <div class="card-face card-front"><div style="font-size:2.2rem;margin-bottom:8px">${v.emoji||'📝'}</div><div class="word">${v.word}</div><div class="phonetic">${v.phonetic}</div>
-            <div style="display:flex;gap:8px;margin-top:8px"><button class="speak-btn small" onclick="event.stopPropagation();speak('${v.word.replace(/'/g,"\\'")}',this)">🔊</button></div><div class="flip-hint">Bấm để lật →</div></div>
+            <div style="display:flex;gap:8px;margin-top:8px"><button class="speak-btn small" data-speak="${v.word}" onclick="speakDataStop(this)">🔊</button></div><div class="flip-hint">Bấm để lật →</div></div>
             <div class="card-face card-back"><div class="meaning">${v.meaning}</div><div class="phonetic">${v.phonetic}</div>
-            <div style="display:flex;gap:8px;margin-top:10px;align-items:center"><button class="speak-btn small" onclick="event.stopPropagation();speak('${v.word.replace(/'/g,"\\'")}',this)">🔊</button><button class="speak-btn small" style="background:linear-gradient(135deg,var(--accent),#F9CA24);color:#7D6608" onclick="event.stopPropagation();doShadow('${v.word.replace(/'/g,"\\'")}','${topic}',${i},this)">🎤</button></div>
+            <div style="display:flex;gap:8px;margin-top:10px;align-items:center"><button class="speak-btn small" data-speak="${v.word}" onclick="speakDataStop(this)">🔊</button><button class="speak-btn small" style="background:linear-gradient(135deg,var(--accent),#F9CA24);color:#7D6608" data-speak="${v.word}" onclick="event.stopPropagation();doShadow(this.getAttribute('data-speak'),'${topic}',${i},this)">🎤</button></div>
             <div class="shadow-counter" id="sc-${topic}-${i}" style="margin-top:8px"><span class="counter-icon">🎤</span> ${cnt}</div><div class="flip-hint">Bấm để lật →</div></div>
         </div></div>`;
     });
@@ -966,7 +1013,7 @@ function openVocab(topic){
     vocab.forEach((v,i)=>{
         const cnt=getShadowCount(v.word);
         c+=`<div class="shadow-item"><div class="shadow-text"><div class="shadow-en">${v.emoji||''} ${v.word}</div><div class="shadow-phonetic">${v.phonetic}</div><div class="shadow-vi">${v.meaning}</div></div>
-        <div class="shadow-controls"><button class="speak-btn small" onclick="speak('${v.word.replace(/'/g,"\\'")}',this)">🔊</button><button class="speak-btn small" style="background:linear-gradient(135deg,var(--accent),#F9CA24);color:#7D6608" onclick="doShadow('${v.word.replace(/'/g,"\\'")}','${topic}',${i},this)">🎤</button>
+        <div class="shadow-controls"><button class="speak-btn small" data-speak="${v.word}" onclick="speakData(this)">🔊</button><button class="speak-btn small" style="background:linear-gradient(135deg,var(--accent),#F9CA24);color:#7D6608" data-speak="${v.word}" onclick="doShadow(this.getAttribute('data-speak'),'${topic}',${i},this)">🎤</button>
         <div class="shadow-counter" id="sl-${topic}-${i}"><span class="counter-icon">🎤</span> ${cnt}</div></div></div>`;
     });
     c+='</div>';
@@ -1109,7 +1156,25 @@ prompts:[
 topic:"Write a short paragraph (60-80 words) describing your favorite outfit.",
 tips:["Describe the colors and style","Say when you like to wear it","Explain why you like it","Use adjectives: comfortable, stylish, casual, elegant"],
 useful_words:["wear","comfortable","favorite","look good","match","go with","style","color"],
-sample:"My favorite outfit is a blue denim jacket with a white T-shirt and black jeans. I usually wear it when I go out with my friends on weekends. I like it because it is both stylish and comfortable. The blue jacket goes well with the black jeans. My friends always say I look good in this outfit."}
+sample:"My favorite outfit is a blue denim jacket with a white T-shirt and black jeans. I usually wear it when I go out with my friends on weekends. I like it because it is both stylish and comfortable. The blue jacket goes well with the black jeans. My friends always say I look good in this outfit."},
+7:{type:"reading",title:"Reading 2: TikTok and Fast Trends",
+passage:"Ten years ago, a fashion trend lasted for months or even years. Today, trends can appear and disappear in just a few weeks. Why? Because of social media, especially TikTok. When a famous TikToker wears something new, millions of young people want to buy the same item. Shops sell out quickly, and fast fashion brands rush to copy the design. This creates a huge problem for the environment. People buy cheap clothes, wear them once or twice, and then throw them away. Every year, about 92 million tons of clothing end up in landfills around the world. Some young people are now fighting back. They buy second-hand clothes from thrift shops or swap clothes with their friends. They believe that being stylish does not mean buying new things all the time.",
+questions:[
+{q:"How long did a fashion trend used to last?",opts:["A few days","Months or even years","One week","One day"],ans:1,exp:"Trong bai: Ten years ago, a fashion trend lasted for months or even years."},
+{q:"Why do trends change so fast today?",opts:["Because of newspapers","Because of TV","Because of social media, especially TikTok","Because of school"],ans:2,exp:"Trong bai: Because of social media, especially TikTok."},
+{q:"What happens when a TikToker wears something new?",opts:["Nobody cares","Millions want to buy the same item","The item becomes cheaper","The trend lasts longer"],ans:1,exp:"Trong bai: millions of young people want to buy the same item."},
+{q:"How much clothing ends up in landfills every year?",opts:["10 million tons","50 million tons","92 million tons","100 million tons"],ans:2,exp:"Trong bai: about 92 million tons of clothing end up in landfills."},
+{q:"How are some young people fighting back?",opts:["Not wearing clothes","Buying second-hand or swapping clothes","Making their own clothes","Wearing uniforms"],ans:1,exp:"Trong bai: They buy second-hand clothes from thrift shops or swap clothes with their friends."}
+]},
+8:{type:"reading",title:"Reading 3: School Uniforms - Good or Bad?",
+passage:"In many countries, students have to wear school uniforms. Some people think uniforms are a great idea. They say uniforms make everyone look equal, so students do not feel pressure to wear expensive clothes. Uniforms also save time in the morning because students do not have to choose what to wear. However, other people disagree. They believe uniforms stop students from expressing their personality through fashion. Some students also complain that uniforms are uncomfortable, especially in hot weather. In Vietnam, most schools require uniforms. The traditional ao dai is worn on special occasions. A recent survey showed that 60 percent of Vietnamese students actually like wearing uniforms because they feel proud of their school. What do you think? Should students wear uniforms or choose their own clothes?",
+questions:[
+{q:"Why do some people support school uniforms?",opts:["They are fashionable","They make everyone look equal","They are cheap","They are colorful"],ans:1,exp:"Trong bai: They say uniforms make everyone look equal."},
+{q:"What is one disadvantage of uniforms?",opts:["Too expensive","Look ugly","Stop students from expressing personality","Hard to find"],ans:2,exp:"Trong bai: uniforms stop students from expressing their personality through fashion."},
+{q:"When do Vietnamese students wear ao dai?",opts:["Every day","On special occasions","Only on Mondays","Never"],ans:1,exp:"Trong bai: The traditional ao dai is worn on special occasions."},
+{q:"What did a survey show about Vietnamese students?",opts:["They all hate uniforms","Only 20% like them","60% actually like wearing uniforms","90% want to change them"],ans:2,exp:"Trong bai: 60 percent of Vietnamese students actually like wearing uniforms."},
+{q:"Why do uniforms save time?",opts:["Students wake up later","Students do not have to choose what to wear","School starts later","Students skip breakfast"],ans:1,exp:"Trong bai: students do not have to choose what to wear."}
+]}
 },
 unit2:{
 0:{type:"vocabulary",title:"Vocabulary: The Five Senses",words:[
@@ -1178,7 +1243,16 @@ prompts:[
 topic:"Write a short review (60-80 words) about a movie, book, or restaurant you like.",
 tips:["Give the name of the movie/book/restaurant","Describe what you liked about it","Use -ed/-ing adjectives","Give a recommendation"],
 useful_words:["recommend","amazing","interesting","delicious","exciting","entertaining","worth","enjoyable"],
-sample:"I recently watched the movie Inside Out 2. It was really entertaining and touching. The story about emotions was very interesting. I was amazed by the beautiful animation. The characters were funny and lovable. I felt excited throughout the movie. I highly recommend it to everyone, especially teenagers. It is the best animated movie I have seen this year."}
+sample:"I recently watched the movie Inside Out 2. It was really entertaining and touching. The story about emotions was very interesting. I was amazed by the beautiful animation. The characters were funny and lovable. I felt excited throughout the movie. I highly recommend it to everyone, especially teenagers. It is the best animated movie I have seen this year."},
+7:{type:"reading",title:"Reading 2: Why Does Music Give Us Goosebumps?",
+passage:"Have you ever listened to a beautiful song and felt goosebumps on your skin? Scientists call this a frisson. It happens when music triggers a strong emotional response in your brain. Your brain releases a chemical called dopamine, which makes you feel happy and excited. Research shows that about 50 percent of people experience musical frisson regularly. Certain types of music are more likely to cause goosebumps. For example, when a song suddenly gets louder, or when a singer hits a very high note. Sad music can also give you goosebumps because it creates a feeling of empathy. Interestingly, people who are more open to new experiences and who have a strong imagination tend to get goosebumps from music more often. So if music gives you goosebumps, it might mean you are a very creative person!",
+questions:[
+{q:"What do scientists call the goosebumps feeling from music?",opts:["Dopamine","Frisson","Emotion","Empathy"],ans:1,exp:"Trong bai: Scientists call this a frisson."},
+{q:"What chemical does your brain release?",opts:["Adrenaline","Serotonin","Dopamine","Oxygen"],ans:2,exp:"Trong bai: Your brain releases a chemical called dopamine."},
+{q:"What percentage of people experience musical frisson?",opts:["10%","25%","50%","80%"],ans:2,exp:"Trong bai: about 50 percent of people experience musical frisson regularly."},
+{q:"What kind of music can also cause goosebumps?",opts:["Fast music","Loud music","Sad music","Quiet music"],ans:2,exp:"Trong bai: Sad music can also give you goosebumps."},
+{q:"What does it mean if music often gives you goosebumps?",opts:["You are tired","You are cold","You might be a very creative person","You need to see a doctor"],ans:2,exp:"Trong bai: it might mean you are a very creative person!"}
+]}
 },
 unit3:{
 0:{type:"vocabulary",title:"Vocabulary: Adventure Activities",words:[
@@ -1248,7 +1322,25 @@ prompts:[
 topic:"Write a short blog post (60-80 words) about a trip or adventure you have had.",
 tips:["Say where you went and when","Describe what you did","Share how you felt","Use Present Perfect and Past Simple"],
 useful_words:["amazing","unforgettable","experience","adventure","explore","discover","recommend","breathtaking"],
-sample:"Last month, I went camping in Ba Vi National Park with my friends. We hiked to the top of the mountain and the view was breathtaking. I have never seen such beautiful scenery before. We also cooked our own food by the campfire. It was the most amazing experience of my life. I highly recommend this place to nature lovers."}
+sample:"Last month, I went camping in Ba Vi National Park with my friends. We hiked to the top of the mountain and the view was breathtaking. I have never seen such beautiful scenery before. We also cooked our own food by the campfire. It was the most amazing experience of my life. I highly recommend this place to nature lovers."},
+7:{type:"reading",title:"Reading 2: Lost in the Amazon",
+passage:"In 2007, a French teenager named Loic Pillois got lost in the Amazon rainforest in South America. He was hiking with a friend when they took a wrong path. His friend found help after a few days, but Loic was alone in the jungle for 52 days. He had no food, no phone, and no map. To survive, he ate insects, frogs, and wild fruits. He drank water from streams, but sometimes the water made him sick. The jungle was full of dangers including snakes, spiders, and heavy rain every day. Loic lost 20 kilograms during his time in the forest. Finally, local fishermen found him near a river. He was very weak but alive. Loic later said that he never gave up because he kept thinking about his family. His story became famous around the world.",
+questions:[
+{q:"Where did Loic get lost?",opts:["In Africa","In the Amazon rainforest","In Australia","In Asia"],ans:1,exp:"Trong bai: got lost in the Amazon rainforest in South America."},
+{q:"How long was Loic alone in the jungle?",opts:["10 days","30 days","52 days","100 days"],ans:2,exp:"Trong bai: Loic was alone in the jungle for 52 days."},
+{q:"What did Loic eat to survive?",opts:["Canned food","Insects, frogs, and wild fruits","Fish and rice","Nothing"],ans:1,exp:"Trong bai: he ate insects, frogs, and wild fruits."},
+{q:"How much weight did Loic lose?",opts:["5 kg","10 kg","20 kg","30 kg"],ans:2,exp:"Trong bai: Loic lost 20 kilograms."},
+{q:"Why did Loic never give up?",opts:["He had a map","He had food","He kept thinking about his family","He met other people"],ans:2,exp:"Trong bai: he never gave up because he kept thinking about his family."}
+]},
+8:{type:"reading",title:"Reading 3: A 15-Year-Old Who Climbed Everest",
+passage:"In 2010, Jordan Romero became the youngest person to reach the top of Mount Everest. He was only 15 years old. Jordan started climbing mountains when he was 9. He saw a painting of the Seven Summits at his school and decided he wanted to climb all of them. His father and stepmother supported his dream and trained with him. The climb up Everest took about two months. The team had to deal with freezing temperatures, strong winds, and thin air. At the top, Jordan called his mother on a satellite phone and said, Mom, I am calling you from the top of the world! Many people were amazed by his achievement, but some criticized his parents for letting such a young person attempt something so dangerous. Jordan later said that the experience taught him that anything is possible if you work hard and believe in yourself.",
+questions:[
+{q:"How old was Jordan when he climbed Everest?",opts:["9","12","15","18"],ans:2,exp:"Trong bai: He was only 15 years old."},
+{q:"What inspired Jordan to start climbing?",opts:["A movie","A painting of the Seven Summits","A book","A TV show"],ans:1,exp:"Trong bai: He saw a painting of the Seven Summits at his school."},
+{q:"How long did the climb take?",opts:["Two weeks","About two months","One year","Three days"],ans:1,exp:"Trong bai: The climb up Everest took about two months."},
+{q:"What did Jordan do at the top?",opts:["Took a photo","Planted a flag","Called his mother on a satellite phone","Cried"],ans:2,exp:"Trong bai: Jordan called his mother on a satellite phone."},
+{q:"What lesson did Jordan learn?",opts:["Mountains are dangerous","Anything is possible if you work hard","You need a lot of money","Climbing is easy"],ans:1,exp:"Trong bai: anything is possible if you work hard and believe in yourself."}
+]}
 },
 unit4:{
 0:{type:"vocabulary",title:"Vocabulary: Materials & Products",words:[
@@ -1317,7 +1409,25 @@ prompts:[
 topic:"Write a short email (60-80 words) to a shop asking about a product you want to buy.",
 tips:["Start with Dear Sir/Madam","Ask about the product, price, and availability","Use polite language: I would like to, Could you please","End with Thank you and your name"],
 useful_words:["enquire","available","price","delivery","discount","product","purchase","information"],
-sample:"Dear Sir or Madam, I am writing to enquire about the blue backpack on your website. Could you please tell me the price and whether it is currently available? I would also like to know if you offer any student discounts. Could you please send me more information about delivery options? Thank you for your time. Best regards, Minh"}
+sample:"Dear Sir or Madam, I am writing to enquire about the blue backpack on your website. Could you please tell me the price and whether it is currently available? I would also like to know if you offer any student discounts. Could you please send me more information about delivery options? Thank you for your time. Best regards, Minh"},
+7:{type:"reading",title:"Reading 2: The Queen of Recycling",
+passage:"When Isatou Ceesay was growing up in a small village in Gambia, Africa, she noticed that plastic bags were everywhere. They polluted the rivers, killed animals, and made people sick. Nobody collected the rubbish. So Isatou had a brilliant idea. She started collecting plastic bags and taught women in her village to cut them into strips and crochet them into beautiful purses and bags. At first, people laughed at her. They called her crazy. But Isatou did not give up. Soon, the colorful recycled bags became popular. Women earned money by selling them at markets. The village became cleaner, and her project spread to other communities. Today, she is known as The Queen of Recycling. Her story shows that one person with a good idea can change the world.",
+questions:[
+{q:"Where is Isatou from?",opts:["Nigeria","Gambia","Kenya","South Africa"],ans:1,exp:"Trong bai: growing up in a small village in Gambia, Africa."},
+{q:"What was the problem in her village?",opts:["No water","No food","Plastic bags were everywhere","No school"],ans:2,exp:"Trong bai: plastic bags were everywhere."},
+{q:"What did Isatou make from plastic bags?",opts:["Shoes","Houses","Purses and bags","Toys"],ans:2,exp:"Trong bai: crochet them into beautiful purses and bags."},
+{q:"How did people react at first?",opts:["They helped her","They laughed at her","They ignored her","They were angry"],ans:1,exp:"Trong bai: At first, people laughed at her."},
+{q:"What is Isatou known as today?",opts:["The Queen of Africa","The Queen of Recycling","The Queen of Fashion","The Queen of Plastic"],ans:1,exp:"Trong bai: she is known as The Queen of Recycling."}
+]},
+8:{type:"reading",title:"Reading 3: How Much Does Your Phone Really Cost?",
+passage:"Your smartphone might cost a few hundred dollars, but its true cost is much higher. Inside every phone, there are rare minerals like cobalt and lithium. These minerals are often mined in Africa, sometimes by children as young as 7 years old. The working conditions are terrible and the pay is very low. After you finish using your phone, it becomes electronic waste, or e-waste. The world produces about 50 million tons of e-waste every year, and only 20 percent is recycled properly. The rest ends up in landfills, where toxic chemicals leak into the soil and water. What can you do? First, keep your phone for as long as possible instead of upgrading every year. Second, when you do replace it, recycle your old phone at a proper collection point. Small actions by millions of people can make a big difference.",
+questions:[
+{q:"What rare minerals are inside phones?",opts:["Gold and silver","Cobalt and lithium","Iron and copper","Diamond and ruby"],ans:1,exp:"Trong bai: rare minerals like cobalt and lithium."},
+{q:"Who sometimes mines these minerals?",opts:["Robots","Scientists","Children as young as 7","Adults only"],ans:2,exp:"Trong bai: sometimes by children as young as 7 years old."},
+{q:"How much e-waste does the world produce each year?",opts:["10 million tons","30 million tons","50 million tons","100 million tons"],ans:2,exp:"Trong bai: about 50 million tons of e-waste every year."},
+{q:"What percentage of e-waste is recycled properly?",opts:["5%","20%","50%","80%"],ans:1,exp:"Trong bai: only 20 percent is recycled properly."},
+{q:"What is one thing you can do to help?",opts:["Buy a new phone every month","Throw your phone in the trash","Keep your phone as long as possible","Never use a phone"],ans:2,exp:"Trong bai: keep your phone for as long as possible."}
+]}
 },
 unit5:{
 0:{type:"vocabulary",title:"Vocabulary: Future Plans",words:[
@@ -1385,7 +1495,25 @@ prompts:[
 topic:"Write a short paragraph (60-80 words) about what you think life will be like in 20 years.",
 tips:["Make predictions using will","Talk about technology, education, or jobs","Give your opinion","Use future time expressions"],
 useful_words:["predict","believe","probably","definitely","technology","improve","change","develop"],
-sample:"I believe life will be very different in 20 years. Technology will improve greatly and most people will use self-driving cars. Students will study using virtual reality at home. I think robots will help us with housework and cooking. However, I am worried about the environment. We need to act now to protect our planet. I hope the future will be better for everyone."}
+sample:"I believe life will be very different in 20 years. Technology will improve greatly and most people will use self-driving cars. Students will study using virtual reality at home. I think robots will help us with housework and cooking. However, I am worried about the environment. We need to act now to protect our planet. I hope the future will be better for everyone."},
+7:{type:"reading",title:"Reading 2: What Jobs Will Disappear by 2040?",
+passage:"Artificial intelligence and robots are getting smarter every year. Experts predict that by 2040, many common jobs will disappear. For example, self-checkout machines are already replacing cashiers in supermarkets. Self-driving trucks may replace truck drivers. AI can now write news articles, so some journalism jobs are at risk. Even doctors might be affected because AI can already analyze X-rays better than some human doctors. But do not worry too much! Many new jobs will appear that we cannot even imagine today. Thirty years ago, nobody knew what a social media manager or app developer was. The key is to keep learning and developing new skills. Experts say that creativity, critical thinking, and communication will be the most important skills in the future. Machines are good at following rules, but humans are better at thinking creatively and understanding emotions.",
+questions:[
+{q:"What is already replacing cashiers?",opts:["Robots","Self-checkout machines","Other workers","Computers"],ans:1,exp:"Trong bai: self-checkout machines are already replacing cashiers."},
+{q:"What can AI do better than some doctors?",opts:["Surgery","Talking to patients","Analyze X-rays","Write prescriptions"],ans:2,exp:"Trong bai: AI can already analyze X-rays better than some human doctors."},
+{q:"What did nobody know about 30 years ago?",opts:["Doctors","Teachers","Social media managers and app developers","Engineers"],ans:2,exp:"Trong bai: nobody knew what a social media manager or app developer was."},
+{q:"What will be the most important skills?",opts:["Math and science","Creativity, critical thinking, and communication","Sports and music","Reading and writing"],ans:1,exp:"Trong bai: creativity, critical thinking, and communication will be the most important skills."},
+{q:"What are humans better at than machines?",opts:["Following rules","Working fast","Thinking creatively and understanding emotions","Doing calculations"],ans:2,exp:"Trong bai: humans are better at thinking creatively and understanding emotions."}
+]},
+8:{type:"reading",title:"Reading 3: Living on Mars",
+passage:"NASA and SpaceX are working on plans to send humans to Mars by the 2030s. But what would life on Mars really be like? First, the journey would take about 7 months. Mars is very different from Earth. The temperature can drop to minus 60 degrees Celsius. There is almost no oxygen, so people would have to live inside special buildings or underground. Growing food would be extremely difficult because the soil on Mars is not suitable for farming. Scientists are experimenting with ways to grow plants in Martian-like conditions. Water exists on Mars as ice, so it could be melted and used. Despite these challenges, thousands of people have already volunteered to be among the first Mars colonists. Would you go to Mars if you had the chance? Remember, there is no guarantee you could ever come back to Earth.",
+questions:[
+{q:"How long would it take to travel to Mars?",opts:["2 months","About 7 months","1 year","2 years"],ans:1,exp:"Trong bai: the journey would take about 7 months."},
+{q:"What is the temperature on Mars?",opts:["Very hot","Same as Earth","Can drop to minus 60 degrees","Always warm"],ans:2,exp:"Trong bai: The temperature can drop to minus 60 degrees Celsius."},
+{q:"Where would people live on Mars?",opts:["In tents","Inside special buildings or underground","In trees","In open areas"],ans:1,exp:"Trong bai: people would have to live inside special buildings or underground."},
+{q:"In what form does water exist on Mars?",opts:["Liquid","Gas","Ice","No water"],ans:2,exp:"Trong bai: Water exists on Mars as ice."},
+{q:"What is a big risk of going to Mars?",opts:["Too expensive","Bad food","You might never come back to Earth","Too boring"],ans:2,exp:"Trong bai: there is no guarantee you could ever come back to Earth."}
+]}
 },
 unit6:{
 0:{type:"vocabulary",title:"Vocabulary: Education & School",words:[
@@ -1453,7 +1581,25 @@ prompts:[
 topic:"Write a short letter (60-80 words) giving advice to a friend who is worried about exams.",
 tips:["Start with: Dear + name","Show you understand their feelings","Give 2-3 pieces of advice using should/must","End with encouragement"],
 useful_words:["worried","prepare","review","concentrate","relax","confident","believe","practice"],
-sample:"Dear Lan, I know you are worried about the exam, but I believe you can do it. You should make a study plan and review a little every day. You must not stay up too late because sleep helps your brain remember things. You should also take short breaks while studying. I am sure you will do well. Good luck! Your friend, Minh"}
+sample:"Dear Lan, I know you are worried about the exam, but I believe you can do it. You should make a study plan and review a little every day. You must not stay up too late because sleep helps your brain remember things. You should also take short breaks while studying. I am sure you will do well. Good luck! Your friend, Minh"},
+7:{type:"reading",title:"Reading 2: How Gaming Can Help You Learn English",
+passage:"Many parents worry that their children spend too much time playing video games. However, research shows that gaming can actually help young people learn English. When you play games in English, you read instructions, chat with other players, and listen to dialogue. You learn new vocabulary without even realizing it. A study from Sweden found that students who played video games in English for at least one hour a day scored higher on English tests than students who did not play. Online multiplayer games are especially helpful because you have to communicate with players from different countries. You must read and write quickly to keep up with the game. Of course, gaming should not replace studying. But if you balance gaming with your schoolwork, it can be a fun and effective way to improve your English skills.",
+questions:[
+{q:"What does research show about gaming and English?",opts:["Gaming is bad for English","Gaming can help learn English","Gaming has no effect","Gaming only helps math"],ans:1,exp:"Trong bai: gaming can actually help young people learn English."},
+{q:"What country did the study come from?",opts:["Japan","USA","Sweden","England"],ans:2,exp:"Trong bai: A study from Sweden found that..."},
+{q:"Why are online multiplayer games especially helpful?",opts:["They are free","You communicate with players from different countries","They are easy","They have subtitles"],ans:1,exp:"Trong bai: you have to communicate with players from different countries."},
+{q:"How much gaming per day helped students?",opts:["30 minutes","At least one hour","Three hours","Five hours"],ans:1,exp:"Trong bai: at least one hour a day."},
+{q:"What is the most important advice?",opts:["Play games all day","Stop playing games","Balance gaming with schoolwork","Only play Vietnamese games"],ans:2,exp:"Trong bai: if you balance gaming with your schoolwork."}
+]},
+8:{type:"reading",title:"Reading 3: The Finnish School System",
+passage:"Finland is famous for having one of the best education systems in the world. But it might surprise you to learn that Finnish students have very little homework. Children in Finland do not start school until they are 7 years old. There are no exams until students are 16. School days are shorter, usually about 5 hours. Students also get a 15-minute break after every 45 minutes of class. Finnish teachers believe that children learn better when they are happy and relaxed. They focus on creative thinking and problem-solving rather than memorizing facts. Teachers in Finland must have a master degree, and the job is highly respected. Despite spending less time in school, Finnish students consistently rank among the top in the world in reading, science, and math. Maybe the lesson here is that quality of learning matters more than quantity.",
+questions:[
+{q:"When do children in Finland start school?",opts:["Age 5","Age 6","Age 7","Age 8"],ans:2,exp:"Trong bai: Children in Finland do not start school until they are 7 years old."},
+{q:"When do Finnish students first have exams?",opts:["Every year","Age 12","Age 16","Never"],ans:2,exp:"Trong bai: There are no exams until students are 16."},
+{q:"How long is a typical school day in Finland?",opts:["3 hours","About 5 hours","8 hours","10 hours"],ans:1,exp:"Trong bai: School days are shorter, usually about 5 hours."},
+{q:"What do Finnish teachers focus on?",opts:["Memorizing facts","Creative thinking and problem-solving","Exams","Homework"],ans:1,exp:"Trong bai: They focus on creative thinking and problem-solving."},
+{q:"What degree must Finnish teachers have?",opts:["Bachelor degree","Master degree","PhD","No degree needed"],ans:1,exp:"Trong bai: Teachers in Finland must have a master degree."}
+]}
 },
 unit7:{
 0:{type:"vocabulary",title:"Vocabulary: Inventions",words:[
@@ -1521,7 +1667,25 @@ prompts:[
 topic:"Write a short paragraph (60-80 words) describing how paper is made or how a product you know is produced.",
 tips:["Use passive voice: is/are + V3","Use sequence words: First, Then, Next, After that, Finally","Describe 3-4 steps","Keep it simple and clear"],
 useful_words:["produced","manufactured","made from","processed","collected","transformed","packaged","delivered"],
-sample:"Paper is made from wood. First, trees are cut down and transported to a paper mill. Then, the wood is cut into small chips and mixed with water and chemicals. After that, the mixture is pressed into thin sheets. The sheets are dried using large machines. Finally, the paper is cut into different sizes and packaged for delivery to shops and offices."}
+sample:"Paper is made from wood. First, trees are cut down and transported to a paper mill. Then, the wood is cut into small chips and mixed with water and chemicals. After that, the mixture is pressed into thin sheets. The sheets are dried using large machines. Finally, the paper is cut into different sizes and packaged for delivery to shops and offices."},
+7:{type:"reading",title:"Reading 2: A Teen Who Helped Clean the Ocean",
+passage:"When Boyan Slat was 14 years old, he went diving in Greece and saw more plastic bags than fish. That moment changed his life. He started researching ocean pollution and discovered that about 8 million tons of plastic enter the ocean every year. At age 16, Boyan gave a TEDx talk about his idea to clean up the ocean. At 18, he dropped out of university to start The Ocean Cleanup, a nonprofit organization. His invention uses the ocean own currents to collect floating plastic. Many adults told him his idea was impossible, but he did not listen. By 2023, his team had removed over 10 million kilograms of trash from the ocean and rivers. Boyan story proves that you are never too young to have a big idea. Age is just a number when you are passionate about solving a problem.",
+questions:[
+{q:"What did Boyan see when diving in Greece?",opts:["Beautiful fish","More plastic bags than fish","Coral reefs","Sharks"],ans:1,exp:"Trong bai: saw more plastic bags than fish."},
+{q:"How much plastic enters the ocean every year?",opts:["1 million tons","5 million tons","8 million tons","20 million tons"],ans:2,exp:"Trong bai: about 8 million tons of plastic enter the ocean every year."},
+{q:"How old was Boyan when he gave his TEDx talk?",opts:["14","16","18","20"],ans:1,exp:"Trong bai: At age 16, Boyan gave a TEDx talk."},
+{q:"What does his invention use to collect plastic?",opts:["Boats","Robots","The ocean own currents","Divers"],ans:2,exp:"Trong bai: His invention uses the ocean own currents to collect floating plastic."},
+{q:"How much trash had his team removed by 2023?",opts:["1 million kg","5 million kg","Over 10 million kg","50 million kg"],ans:2,exp:"Trong bai: removed over 10 million kilograms of trash."}
+]},
+8:{type:"reading",title:"Reading 3: From Failure to Success - The Dyson Story",
+passage:"James Dyson is a British inventor who created the famous Dyson vacuum cleaner. But his road to success was not easy. Dyson spent 15 years developing his bagless vacuum cleaner. He made 5126 failed prototypes before he finally got it right. That means he failed 5126 times! Every time a prototype did not work, he learned something new and tried again. When he tried to sell his invention, every major manufacturer rejected it. They did not believe a bagless vacuum could work. So Dyson decided to manufacture it himself. Today, Dyson is a billionaire and his company sells products in over 65 countries. His vacuum cleaners, fans, and hair dryers are known for innovative design. Dyson often tells young people: Enjoy failure and learn from it. You can never learn from success.",
+questions:[
+{q:"What did Dyson invent?",opts:["A washing machine","A bagless vacuum cleaner","A robot","A car"],ans:1,exp:"Trong bai: created the famous Dyson vacuum cleaner."},
+{q:"How many failed prototypes did Dyson make?",opts:["100","1000","5126","10000"],ans:2,exp:"Trong bai: He made 5126 failed prototypes."},
+{q:"How long did Dyson spend developing his vacuum?",opts:["5 years","10 years","15 years","20 years"],ans:2,exp:"Trong bai: Dyson spent 15 years developing his bagless vacuum cleaner."},
+{q:"What happened when Dyson tried to sell his invention?",opts:["Everyone loved it","Every manufacturer rejected it","It was too expensive","It broke"],ans:1,exp:"Trong bai: every major manufacturer rejected it."},
+{q:"What does Dyson tell young people?",opts:["Never fail","Give up if it is hard","Enjoy failure and learn from it","Only follow safe ideas"],ans:2,exp:"Trong bai: Enjoy failure and learn from it."}
+]}
 },
 unit8:{
 0:{type:"vocabulary",title:"Vocabulary: Films & TV",words:[
@@ -1589,7 +1753,25 @@ prompts:[
 topic:"Write a short review (60-80 words) about a movie or TV show you have watched recently.",
 tips:["Give the name and genre","Describe the plot briefly (no spoilers!)","Share your opinion using adjectives","Say who you would recommend it to"],
 useful_words:["plot","acting","director","scene","recommend","entertaining","boring","thrilling","surprising","touching"],
-sample:"I recently watched Doraemon: Nobita and the Sky Utopia. It is an animated adventure movie. The plot is about Doraemon and Nobita searching for a perfect paradise in the sky. The animation was beautiful and the story was touching. I was moved by the message about friendship and believing in yourself. I highly recommend this movie to families and anyone who loves Doraemon."}
+sample:"I recently watched Doraemon: Nobita and the Sky Utopia. It is an animated adventure movie. The plot is about Doraemon and Nobita searching for a perfect paradise in the sky. The animation was beautiful and the story was touching. I was moved by the message about friendship and believing in yourself. I highly recommend this movie to families and anyone who loves Doraemon."},
+7:{type:"reading",title:"Reading 2: Why K-Dramas Are Taking Over the World",
+passage:"In the last few years, Korean dramas have become incredibly popular worldwide. Shows like Squid Game and Crash Landing on You have millions of fans in every country. Why are K-dramas so popular? First, they have exciting storylines with unexpected plot twists. Second, the actors are very talented and expressive. Third, K-dramas often mix different genres like romance, comedy, action, and mystery in one show. They also deal with universal themes like love, friendship, family, and social justice. Another reason is that K-dramas are usually short, only 16 to 20 episodes, so you do not have to commit to watching for years. Many young people around the world have started learning Korean because of K-dramas. The Korean Wave, or Hallyu, is not just about dramas. It includes K-pop music, Korean food, and Korean fashion too.",
+questions:[
+{q:"Which K-drama is mentioned in the passage?",opts:["Parasite","Squid Game","BTS World","Running Man"],ans:1,exp:"Trong bai: Shows like Squid Game and Crash Landing on You."},
+{q:"How many episodes do K-dramas usually have?",opts:["5 to 10","16 to 20","50 to 100","Over 200"],ans:1,exp:"Trong bai: only 16 to 20 episodes."},
+{q:"What have many young people started doing because of K-dramas?",opts:["Cooking Korean food","Learning Korean","Moving to Korea","Becoming actors"],ans:1,exp:"Trong bai: Many young people have started learning Korean because of K-dramas."},
+{q:"What is Hallyu?",opts:["A K-drama","A K-pop group","The Korean Wave","A Korean food"],ans:2,exp:"Trong bai: The Korean Wave, or Hallyu."},
+{q:"Why is the short length of K-dramas an advantage?",opts:["They are cheaper","Easier to understand","You do not have to watch for years","They have better actors"],ans:2,exp:"Trong bai: you do not have to commit to watching for years."}
+]},
+8:{type:"reading",title:"Reading 3: Will AI Replace Actors in Movies?",
+passage:"In 2023, Hollywood actors went on strike. One of their biggest concerns was artificial intelligence. Film studios had started using AI to create digital copies of actors faces and voices. Some actors worried that studios could use their digital likeness without permission or payment. AI technology can now create realistic-looking people who do not even exist. Deepfake videos can make it look like someone said something they never actually said. This raises serious questions about privacy and copyright. However, AI also has positive uses in filmmaking. It can create amazing visual effects that would be impossible or too expensive to film in real life. AI can also help with translating and dubbing movies into different languages. Most experts believe that AI will not completely replace human actors. People want to watch real emotions and real performances.",
+questions:[
+{q:"Why did Hollywood actors go on strike in 2023?",opts:["Low salaries","Long working hours","Concerns about AI","Bad scripts"],ans:2,exp:"Trong bai: One of their biggest concerns was artificial intelligence."},
+{q:"What can AI technology create?",opts:["Animals","Buildings","Realistic-looking people who do not exist","Nature scenes"],ans:2,exp:"Trong bai: AI technology can now create realistic-looking people who do not even exist."},
+{q:"What is a deepfake?",opts:["A type of camera","A video making someone appear to say things they never said","A new movie genre","A special effect"],ans:1,exp:"Trong bai: Deepfake videos can make it look like someone said something they never actually said."},
+{q:"How can AI help with movies positively?",opts:["Replace all actors","Create visual effects and help translate movies","Write better stories","Make movies shorter"],ans:1,exp:"Trong bai: It can create amazing visual effects... AI can also help with translating and dubbing."},
+{q:"What do most experts believe?",opts:["AI will replace all actors","AI will not completely replace human actors","Movies will disappear","AI is not useful"],ans:1,exp:"Trong bai: Most experts believe that AI will not completely replace human actors."}
+]}
 }
 };
 
@@ -1621,8 +1803,8 @@ function renderVocabLesson(lc){
                 <div class="vl-meaning">${w.meaning}</div>
                 <div class="vl-example">"${w.example}"</div>
             </div>
-            <button class="speak-btn small" onclick="speak('${w.word.replace(/'/g,"\\'")}',this)">🔊</button>
-            <button class="speak-btn small" onclick="speak('${w.example.replace(/'/g,"\\'")}',this)" style="background:linear-gradient(135deg,var(--accent),#F9CA24);color:#7D6608">📢</button>
+            <button class="speak-btn small" data-speak="${w.word}" onclick="speakData(this)">🔊</button>
+            <button class="speak-btn small" data-speak="${w.example}" onclick="speakData(this)" style="background:linear-gradient(135deg,var(--accent),#F9CA24);color:#7D6608">📢</button>
         </div>`;
     });
     return h;
@@ -1667,7 +1849,7 @@ function renderGrammarLesson(lc,unitId,lessonIdx){
     h+=`<div class="grammar-formula">${lc.formula}</div>`;
     h+=`<div class="grammar-box"><h4>💡 Giải thích</h4><p>${lc.explanation}</p>`;
     lc.examples.forEach(ex=>{
-        h+=`<div class="example"><span class="example-text">📝 ${ex}</span><button class="speak-btn small" onclick="event.stopPropagation();speak('${ex.replace(/'/g,"\\'").replace(/ \(.*?\)/g,"")}',this)">🔊</button></div>`;
+        h+=`<div class="example"><span class="example-text">📝 ${ex}</span><button class="speak-btn small" data-speak="${ex.replace(/ \(.*?\)/g,'')}" onclick="speakDataStop(this)">🔊</button></div>`;
     });
     h+=`</div>`;
     h+=`<h4 style="font-weight:900;margin:20px 0 12px">✏️ Bài tập</h4>`;
@@ -1702,7 +1884,7 @@ function renderListeningLesson(lc){
     // Show dialogue text with speak buttons
     lc.dialogue.forEach(d=>{
         h+=`<div class="speaking-sentence"><b>${d.speaker}:</b> <span class="sent-text">${d.text}</span><span class="sent-vi">${d.vi}</span>
-        <button class="speak-btn small" onclick="speak('${d.text.replace(/'/g,"\\'")}',this)">🔊</button></div>`;
+        <button class="speak-btn small" data-speak="${d.text}" onclick="speakData(this)">🔊</button></div>`;
     });
     window._currentDialogue=lc.dialogue;
     h+=`<h4 style="font-weight:900;margin:20px 0 12px">❓ Questions</h4>`;
@@ -1739,8 +1921,8 @@ function renderSpeakingLesson(lc){
         h+=`<div class="speaking-sentence">
             <span class="sent-text">${p.model}</span>
             <span class="sent-vi">${p.vi}</span>
-            <button class="speak-btn small" onclick="speak('${p.model.replace(/'/g,"\\'")}',this)">🔊</button>
-            <button class="speak-btn small" style="background:linear-gradient(135deg,var(--accent),#F9CA24);color:#7D6608" onclick="doShadowSentence('${p.model.replace(/'/g,"\\'")}',this)">🎤</button>
+            <button class="speak-btn small" data-speak="${p.model}" onclick="speakData(this)">🔊</button>
+            <button class="speak-btn small" style="background:linear-gradient(135deg,var(--accent),#F9CA24);color:#7D6608" data-speak="${p.model}" onclick="doShadowSentence(this.getAttribute('data-speak'),this)">🎤</button>
         </div>`;
     });
     return h;
@@ -1845,7 +2027,7 @@ function startWordMatch(){
     openGameModal('🔗 Word Match','Nối từ tiếng Anh với nghĩa tiếng Việt');
     let h=`<div class="memory-stats"><div class="memory-stat pairs" id="matchPairsDisplay">✅ Đã nối: 0/${matchTotal}</div></div>`;
     h+=`<div class="match-container"><div class="match-col"><div class="match-col-title en">🔤 English</div>`;
-    enWords.forEach((v,i)=>{h+=`<div class="match-item" data-type="en" data-word="${v.word}" onclick="selectMatch(this)">${v.word} <button class="speak-btn small" style="width:28px;height:28px;font-size:.8rem;margin-left:6px;vertical-align:middle" onclick="event.stopPropagation();speak('${v.word.replace(/'/g,"\\'")}',this)">🔊</button></div>`});
+    enWords.forEach((v,i)=>{h+=`<div class="match-item" data-type="en" data-word="${v.word}" onclick="selectMatch(this)">${v.word} <button class="speak-btn small" style="width:28px;height:28px;font-size:.8rem;margin-left:6px;vertical-align:middle" data-speak="${v.word}" onclick="speakDataStop(this)">🔊</button></div>`});
     h+=`</div><div class="match-col"><div class="match-col-title vi">🇻🇳 Tiếng Việt</div>`;
     viWords.forEach((v,i)=>{h+=`<div class="match-item" data-type="vi" data-word="${v.word}" onclick="selectMatch(this)">${v.meaning}</div>`});
     h+=`</div></div>`;
