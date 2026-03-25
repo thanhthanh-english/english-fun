@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🔊 Test Âm Thanh</title>
+<script src="https://code.responsivevoice.org/responsivevoice.js?key=pVAluRyih"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;padding:20px;background:#1a1a2e;color:#fff;min-height:100vh}
+h2{text-align:center;margin-bottom:20px;font-size:1.3rem}
+.test-btn{display:block;width:100%;padding:18px;margin:10px 0;border:none;border-radius:12px;font-size:1rem;font-weight:bold;cursor:pointer;color:#fff;text-align:left}
+.b1{background:#e74c3c}.b2{background:#3498db}.b3{background:#2ecc71}.b4{background:#f39c12}
+.status{font-size:.85rem;color:#aaa;margin:5px 0 15px 0;min-height:20px}
+.result{padding:10px;border-radius:8px;margin:5px 0;font-size:.9rem;display:none}
+.ok{background:#2ecc71;display:block}.fail{background:#e74c3c;display:block}
+#log{background:#111;padding:15px;border-radius:10px;margin-top:20px;font-size:.8rem;color:#0f0;max-height:200px;overflow-y:auto;white-space:pre-wrap}
+</style></head><body>
+<h2>🔊 Test Âm Thanh Trên Điện Thoại</h2>
+<p style="text-align:center;color:#aaa;margin-bottom:20px;font-size:.9rem">Bấm từng nút để test. Nút nào phát được tiếng = ✅</p>
+
+<button class="test-btn b1" onclick="test1(this)">1️⃣ Test speechSynthesis (có sẵn trong trình duyệt)</button>
+<div class="status" id="s1">Chưa test</div>
+
+<button class="test-btn b2" onclick="test2(this)">2️⃣ Test ResponsiveVoice (thư viện bên ngoài)</button>
+<div class="status" id="s2">Chưa test</div>
+
+<button class="test-btn b3" onclick="test3(this)">3️⃣ Test Google Translate TTS (audio file)</button>
+<div class="status" id="s3">Chưa test</div>
+
+<button class="test-btn b4" onclick="test4(this)">4️⃣ Test Audio Unlock + speechSynthesis</button>
+<div class="status" id="s4">Chưa test</div>
+
+<div id="log">📋 Log:\n</div>
+
+<script>
+var log=document.getElementById('log');
+function addLog(msg){log.textContent+=msg+'\n';log.scrollTop=log.scrollHeight}
+
+// Info
+addLog('User Agent: '+navigator.userAgent.substring(0,80));
+addLog('speechSynthesis: '+('speechSynthesis' in window));
+addLog('ResponsiveVoice: '+(typeof responsiveVoice!=='undefined'));
+setTimeout(function(){addLog('RV after 3s: '+(typeof responsiveVoice!=='undefined'))},3000);
+
+// Test 1: Raw speechSynthesis
+function test1(btn){
+    var s=document.getElementById('s1');
+    if(!('speechSynthesis' in window)){s.textContent='❌ Trình duyệt không hỗ trợ speechSynthesis';addLog('Test1: NO speechSynthesis');return}
+    try{
+        window.speechSynthesis.cancel();
+        var u=new SpeechSynthesisUtterance('Hello, this is a test of speech synthesis');
+        u.lang='en-US';u.rate=0.9;u.volume=1;
+        var voices=window.speechSynthesis.getVoices();
+        addLog('Test1: voices='+voices.length);
+        u.onend=function(){s.textContent='✅ Phát thành công!';addLog('Test1: SUCCESS')};
+        u.onerror=function(e){s.textContent='❌ Lỗi: '+e.error;addLog('Test1: ERROR '+e.error)};
+        window.speechSynthesis.speak(u);
+        s.textContent='⏳ Đang phát...';
+        addLog('Test1: speaking...');
+    }catch(e){s.textContent='❌ Exception: '+e.message;addLog('Test1: EXCEPTION '+e.message)}
+}
+
+// Test 2: ResponsiveVoice
+function test2(btn){
+    var s=document.getElementById('s2');
+    if(typeof responsiveVoice==='undefined'){s.textContent='❌ ResponsiveVoice chưa tải xong, đợi 3s rồi thử lại';addLog('Test2: RV not loaded');return}
+    try{
+        responsiveVoice.speak('Hello, this is a test of responsive voice','US English Female',{
+            rate:0.9,
+            onend:function(){s.textContent='✅ Phát thành công!';addLog('Test2: SUCCESS')},
+            onerror:function(){s.textContent='❌ ResponsiveVoice lỗi';addLog('Test2: ERROR')}
+        });
+        s.textContent='⏳ Đang phát...';
+        addLog('Test2: speaking...');
+    }catch(e){s.textContent='❌ Exception: '+e.message;addLog('Test2: EXCEPTION '+e.message)}
+}
+
+// Test 3: Google Translate TTS
+function test3(btn){
+    var s=document.getElementById('s3');
+    try{
+        var url='https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=Hello+this+is+a+test+of+Google+Translate';
+        var audio=new Audio(url);
+        audio.onended=function(){s.textContent='✅ Phát thành công!';addLog('Test3: SUCCESS')};
+        audio.onerror=function(){s.textContent='❌ Không tải được audio';addLog('Test3: ERROR loading')};
+        var p=audio.play();
+        if(p)p.then(function(){addLog('Test3: play() OK')}).catch(function(e){s.textContent='❌ Play bị chặn: '+e.message;addLog('Test3: BLOCKED '+e.message)});
+        s.textContent='⏳ Đang phát...';
+        addLog('Test3: playing...');
+    }catch(e){s.textContent='❌ Exception: '+e.message;addLog('Test3: EXCEPTION '+e.message)}
+}
+
+// Test 4: Unlock audio first, then speechSynthesis
+function test4(btn){
+    var s=document.getElementById('s4');
+    addLog('Test4: Unlocking audio...');
+    // Unlock with AudioContext
+    try{
+        var ctx=new(window.AudioContext||window.webkitAudioContext)();
+        var buf=ctx.createBuffer(1,1,22050);
+        var src=ctx.createBufferSource();
+        src.buffer=buf;src.connect(ctx.destination);
+        if(src.start)src.start(0);else src.noteOn(0);
+        addLog('Test4: AudioContext unlocked');
+    }catch(e){addLog('Test4: AudioContext fail: '+e.message)}
+    
+    // Unlock speechSynthesis with empty utterance
+    if('speechSynthesis' in window){
+        try{
+            var empty=new SpeechSynthesisUtterance('');
+            empty.volume=0;
+            window.speechSynthesis.speak(empty);
+            addLog('Test4: speechSynthesis unlocked');
+        }catch(e){addLog('Test4: SS unlock fail')}
+    }
+    
+    // Now try speaking after short delay
+    setTimeout(function(){
+        if(!('speechSynthesis' in window)){s.textContent='❌ Không hỗ trợ';return}
+        try{
+            window.speechSynthesis.cancel();
+            var u=new SpeechSynthesisUtterance('This is test four with audio unlock first');
+            u.lang='en-US';u.rate=0.9;u.volume=1;
+            u.onend=function(){s.textContent='✅ Phát thành công sau unlock!';addLog('Test4: SUCCESS')};
+            u.onerror=function(e){s.textContent='❌ Lỗi: '+(e.error||'unknown');addLog('Test4: ERROR')};
+            window.speechSynthesis.speak(u);
+            s.textContent='⏳ Đang phát sau unlock...';
+            addLog('Test4: speaking after unlock...');
+        }catch(e){s.textContent='❌ '+e.message;addLog('Test4: EXCEPTION')}
+    },300);
+}
+
+// Pre-load voices
+if('speechSynthesis' in window){
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged=function(){
+        var v=window.speechSynthesis.getVoices();
+        addLog('Voices loaded: '+v.length);
+    }
+}
+</script></body></html>
