@@ -1084,20 +1084,32 @@ function speakWithBrowser(text,btn,onEnd){
 function speak(text,btn,onEnd){
     stopSpeech();unlockAudio();
     if(btn)btn.classList.add("speaking");
-    var isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if(isMobile){
-        // Mobile: Oddcast first (proven to work), fallback to browser then RV
-        speakWithOddcast(text,btn,onEnd);
+    // Try ResponsiveVoice first (best quality on all devices)
+    if(hasRV){
+        try{
+            var timeout=setTimeout(function(){
+                // If RV doesn't respond in 3s, fallback
+                speakWithOddcast(text,btn,onEnd);
+            },3000);
+            responsiveVoice.speak(text,"US English Female",{
+                rate:speechRate,
+                onstart:function(){clearTimeout(timeout)},
+                onend:function(){clearTimeout(timeout);if(btn)btn.classList.remove("speaking");if(onEnd)onEnd()},
+                onerror:function(){clearTimeout(timeout);if(btn)btn.classList.remove("speaking");speakWithOddcast(text,btn,onEnd)}
+            });
+        }catch(e){speakWithOddcast(text,btn,onEnd)}
+    }else if(hasSpeech){
+        speakWithBrowser(text,btn,onEnd);
     }else{
-        // Desktop: ResponsiveVoice > speechSynthesis > Oddcast
-        if(hasRV){
-            try{responsiveVoice.speak(text,"US English Female",{rate:speechRate,onend:function(){if(btn)btn.classList.remove("speaking");if(onEnd)onEnd()},onerror:function(){if(btn)btn.classList.remove("speaking");speakWithBrowser(text,btn,onEnd)}})}catch(e){speakWithBrowser(text,btn,onEnd)}
-        }else{speakWithBrowser(text,btn,onEnd)}
+        speakWithOddcast(text,btn,onEnd);
     }
 }
 
 if(hasSpeech){try{window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices()}}catch(e){}}
-setTimeout(function(){hasRV=(typeof responsiveVoice!=="undefined")},3000);
+// Check RV multiple times to catch late loading
+setTimeout(function(){hasRV=(typeof responsiveVoice!=="undefined")},2000);
+setTimeout(function(){hasRV=(typeof responsiveVoice!=="undefined")},4000);
+setTimeout(function(){hasRV=(typeof responsiveVoice!=="undefined")},8000);
 
 function speakData(btn){var t=btn.getAttribute("data-speak");if(t)speak(t,btn)}
 function speakDataStop(btn){event.stopPropagation();speakData(btn)}
