@@ -51,14 +51,24 @@
         .unit-card .progress-fill{height:100%;background:linear-gradient(90deg,var(--success),#55EFC4);border-radius:10px;transition:width .5s ease}
         .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:1000;padding:15px}
         .modal-overlay.active{display:flex}
-        .modal{background:#fff;border-radius:var(--radius);max-width:800px;width:100%;max-height:90vh;overflow-y:auto;animation:modalIn .4s ease;position:relative}
-        @keyframes modalIn{from{transform:scale(.9) translateY(30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+        .modal{background:#fff;border-radius:var(--radius);max-width:800px;width:100%;max-height:90vh;overflow-y:auto;animation:modalIn .45s cubic-bezier(.175,.885,.32,1.275);position:relative}
+        @keyframes modalIn{from{transform:scale(.85) translateY(40px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
         .modal-header{padding:20px 25px;background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);color:#fff;position:sticky;top:0;z-index:10;border-radius:var(--radius) var(--radius) 0 0}
         .modal-header h2{font-size:clamp(1.3rem,4vw,1.8rem);font-weight:900;margin-bottom:4px;padding-right:40px}
         .modal-header p{opacity:.9;font-size:.95rem;font-weight:700}
         .modal-close{position:absolute;top:15px;right:15px;background:rgba(255,255,255,.25);border:none;width:38px;height:38px;border-radius:50%;color:#fff;font-size:1.3rem;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif}
         .modal-close:hover{background:rgba(255,255,255,.4);transform:rotate(90deg) scale(1.1)}
-        .modal-content{padding:20px 25px}
+        .modal-content{padding:20px 25px;position:relative;overflow:hidden}
+        .modal-bg-emojis{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:0}
+        .modal-bg-emojis span{position:absolute;opacity:.12;font-size:1.8rem;animation:modalFloat 12s infinite linear}
+        .modal-bg-emojis span:nth-child(1){left:5%;top:10%;animation-delay:0s;animation-duration:14s}
+        .modal-bg-emojis span:nth-child(2){left:80%;top:20%;animation-delay:2s;animation-duration:11s}
+        .modal-bg-emojis span:nth-child(3){left:20%;top:50%;animation-delay:4s;animation-duration:16s}
+        .modal-bg-emojis span:nth-child(4){left:65%;top:70%;animation-delay:1s;animation-duration:13s}
+        .modal-bg-emojis span:nth-child(5){left:40%;top:85%;animation-delay:3s;animation-duration:15s}
+        .modal-bg-emojis span:nth-child(6){left:90%;top:45%;animation-delay:5s;animation-duration:12s}
+        @keyframes modalFloat{0%{transform:translateY(0) rotate(0deg) scale(1)}25%{transform:translateY(-30px) rotate(15deg) scale(1.1)}50%{transform:translateY(-10px) rotate(-10deg) scale(.9)}75%{transform:translateY(-40px) rotate(20deg) scale(1.05)}100%{transform:translateY(0) rotate(0deg) scale(1)}}
+        .modal-content>*{position:relative;z-index:1}
         .lesson-list{display:flex;flex-direction:column;gap:10px}
         .lesson-item{display:flex;align-items:center;gap:12px;padding:15px;background:#f8fafc;border-radius:var(--radius-sm);cursor:pointer;transition:all .3s;border:2px solid transparent}
         .lesson-item:hover,.lesson-item:active{background:#EDE7F6;border-color:var(--primary);transform:translateX(3px)}
@@ -149,11 +159,40 @@
         .confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden}
         .confetti-piece{position:absolute;width:10px;height:10px;top:-10px;animation:confettiFall 3s linear forwards}
         @keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
-        .footer{text-align:center;padding:25px;color:rgba(255,255,255,.8);font-weight:700;font-size:.9rem}
-        .section{display:none}.section.active{display:block}
+        .footer{text-align:center;padding:30px 20px;color:rgba(255,255,255,.9);font-weight:700;font-size:.9rem}
+        .footer-card{background:linear-gradient(135deg,rgba(108,92,231,.3),rgba(162,155,254,.2));backdrop-filter:blur(10px);border-radius:var(--radius);padding:25px 20px;max-width:400px;margin:0 auto;border:1px solid rgba(255,255,255,.15)}
+        .footer-card .ft-teacher{font-size:1.2rem;font-weight:900;color:#fff;margin-bottom:4px}
+        .footer-card .ft-motto{font-style:italic;font-size:.9rem;color:rgba(255,255,255,.8);font-weight:600;margin-bottom:15px}
+        .footer-card .ft-qr{width:150px;height:150px;border-radius:12px;background:#fff;padding:6px;margin:0 auto 12px;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+        .footer-card .ft-qr img{width:100%;height:100%;border-radius:8px}
+        .footer-card .ft-scan{font-size:.85rem;color:rgba(255,255,255,.7);font-weight:700;margin-bottom:10px}
+        .footer-card .ft-brand{font-size:.75rem;color:rgba(255,255,255,.5);font-weight:600;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)}
+        .section{display:none;animation:sectionIn .4s ease}.section.active{display:block}
+        @keyframes sectionIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
         .shadow-all-btn{padding:10px 20px;border:none;border-radius:50px;font-weight:800;font-size:.9rem;cursor:pointer;transition:all .3s;font-family:'Nunito',sans-serif;background:linear-gradient(135deg,var(--accent),#F9CA24);color:#7D6608;box-shadow:0 3px 12px rgba(253,203,110,.4)}
         .shadow-all-btn:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(253,203,110,.5)}
         /* Lesson Content Styles */
+        /* Emoji Rain */
+        .emoji-rain{position:fixed;top:-40px;font-size:1.6rem;z-index:9998;pointer-events:none;animation:emojiDrop 2.5s linear forwards}
+        @keyframes emojiDrop{0%{transform:translateY(0) rotate(0deg);opacity:1}80%{opacity:1}100%{transform:translateY(105vh) rotate(360deg);opacity:0}}
+        /* Particle burst */
+        .particle{position:fixed;width:8px;height:8px;border-radius:50%;z-index:9998;pointer-events:none;animation:particleBurst .8s ease-out forwards}
+        @keyframes particleBurst{0%{transform:translate(0,0) scale(1);opacity:1}100%{opacity:0}}
+        /* Combo popup */
+        .combo-display{position:fixed;top:45%;left:50%;transform:translate(-50%,-50%);z-index:9998;pointer-events:none;font-weight:900;color:var(--accent);text-shadow:0 4px 20px rgba(253,203,110,.6),0 0 40px rgba(253,203,110,.3);animation:comboPop .9s ease-out forwards;font-family:'Nunito',sans-serif}
+        @keyframes comboPop{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}25%{transform:translate(-50%,-50%) scale(1.4);opacity:1}50%{transform:translate(-50%,-50%) scale(1.1);opacity:1}100%{transform:translate(-50%,-70%) scale(.8);opacity:0}}
+        /* Enhanced quiz correct/wrong */
+        .quiz-option.correct{border-color:var(--success);background:#D5F5E3;animation:correctPop .5s cubic-bezier(.175,.885,.32,1.275)}
+        @keyframes correctPop{0%{transform:scale(1)}40%{transform:scale(1.05)}100%{transform:scale(1)}}
+        .quiz-option.wrong{border-color:var(--danger);background:#FDECEA;animation:wrongShake .5s ease}
+        @keyframes wrongShake{0%,100%{transform:translateX(0)}15%{transform:translateX(-10px) rotate(-1deg)}30%{transform:translateX(10px) rotate(1deg)}45%{transform:translateX(-6px)}60%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+        /* Staggered card entrance */
+        .units-grid>*{animation:cardIn .5s ease both}
+        .units-grid>*:nth-child(1){animation-delay:.05s}.units-grid>*:nth-child(2){animation-delay:.1s}
+        .units-grid>*:nth-child(3){animation-delay:.15s}.units-grid>*:nth-child(4){animation-delay:.2s}
+        .units-grid>*:nth-child(5){animation-delay:.25s}.units-grid>*:nth-child(6){animation-delay:.3s}
+        .units-grid>*:nth-child(7){animation-delay:.35s}.units-grid>*:nth-child(8){animation-delay:.4s}
+        @keyframes cardIn{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
         /* Vietnamese Toggle */
         .vi-toggle{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
         .vi-toggle label{color:rgba(255,255,255,.9);font-weight:800;font-size:.85rem;cursor:pointer}
@@ -169,6 +208,9 @@
         .lesson-back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:none;border-radius:50px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:'Nunito',sans-serif;background:#e2e8f0;color:var(--text-dark);margin-bottom:15px;transition:all .3s}
         .lesson-back-btn:hover{background:#D1C4E9;transform:translateX(-3px)}
         .reading-passage{background:linear-gradient(135deg,#f8fafc,#EDE7F6);padding:20px;border-radius:var(--radius-sm);margin-bottom:20px;border-left:5px solid var(--info);line-height:1.8;font-size:.95rem;font-weight:600}
+        .sent-pair{margin-bottom:6px}.sent-en{color:#2D3436;font-weight:700}.sent-vi{color:var(--info);font-weight:600;font-size:.88rem;font-style:italic;margin-top:1px;display:block;opacity:.85}
+        .reading-passage.hide-vi .sent-vi{display:none}
+        .toggle-vi-btn{background:linear-gradient(135deg,var(--info),#74B9FF);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:.82rem;font-weight:800;cursor:pointer;margin-left:8px}
         .reading-passage .passage-title{font-weight:900;font-size:1.1rem;color:var(--primary);margin-bottom:10px;display:flex;align-items:center;gap:8px}
         .sent-pair{margin-bottom:6px}.sent-en{color:#2D3436;font-weight:700}.sent-vi{color:var(--info);font-weight:600;font-size:.88rem;font-style:italic;margin-top:1px;display:block;opacity:.85}
         .reading-passage.hide-vi .sent-vi{display:none}
@@ -313,6 +355,130 @@
         .report-btn.copy:hover{background:#D1C4E9}
         .report-btn.reset{background:#FDECEA;color:var(--danger);font-size:.8rem;padding:8px 16px}
         .report-note{font-size:.75rem;color:var(--text-light);font-weight:600;text-align:center;margin-top:10px;font-style:italic}
+        /* Card Skins Collection */
+        .skin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:15px}
+        .skin-card{border-radius:16px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .4s cubic-bezier(.175,.885,.32,1.275);position:relative;overflow:hidden;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+        .skin-card:hover{transform:translateY(-5px) scale(1.03)}
+        /* Common */
+        .skin-card.common{background:#f8fafc;border:2px solid #cbd5e1;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+        .skin-card.common .skin-rarity{color:#94a3b8;font-size:.7rem}
+        /* Rare */
+        .skin-card.rare{background:linear-gradient(145deg,rgba(99,102,241,.08),rgba(168,85,247,.08));border:2px solid #a78bfa;box-shadow:0 4px 20px rgba(139,92,246,.15)}
+        .skin-card.rare::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(167,139,250,.15) 50%,transparent 60%);animation:rareShine 3s ease infinite}
+        @keyframes rareShine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+        .skin-card.rare .skin-rarity{color:#8b5cf6;font-size:.7rem}
+        /* Legendary */
+        .skin-card.legendary{background:linear-gradient(145deg,#fffbeb,#fef3c7);border:3px solid transparent;background-clip:padding-box;box-shadow:0 0 20px rgba(253,203,110,.3),0 8px 30px rgba(245,158,11,.15)}
+        .skin-card.legendary::before{content:'';position:absolute;inset:-3px;border-radius:18px;background:linear-gradient(135deg,#f59e0b,#fbbf24,#f59e0b,#fde68a,#f59e0b);z-index:-1;animation:legendBorder 3s linear infinite}
+        @keyframes legendBorder{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+        .skin-card.legendary::after{content:'';position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,transparent 20%,rgba(253,203,110,.3) 40%,rgba(255,255,255,.5) 50%,rgba(253,203,110,.3) 60%,transparent 80%);animation:holoShine 2s ease infinite;pointer-events:none}
+        @keyframes holoShine{0%{transform:translateX(-120%) rotate(25deg)}100%{transform:translateX(120%) rotate(25deg)}}
+        .skin-card.legendary .skin-rarity{color:#d97706;font-size:.7rem;font-weight:900}
+        /* Locked */
+        .skin-card.locked{opacity:.5;filter:grayscale(.8);cursor:default}
+        .skin-card.locked:hover{transform:none}
+        .skin-card.locked::after{content:'🔒';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2rem;filter:none}
+        .skin-card .skin-emoji{font-size:2rem;margin-bottom:6px;position:relative;z-index:1}
+        .skin-card .skin-name{font-weight:800;font-size:.85rem;color:var(--text-dark);position:relative;z-index:1}
+        .skin-card .skin-rarity{font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-top:4px;position:relative;z-index:1}
+        .skin-card .skin-req{font-size:.7rem;font-weight:600;color:var(--text-light);margin-top:4px;position:relative;z-index:1}
+        /* Chest / Unlock animation */
+        .chest-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:10002;opacity:0;pointer-events:none;transition:opacity .4s}
+        .chest-overlay.show{opacity:1;pointer-events:auto}
+        .chest-box{text-align:center}
+        .chest-box .chest-emoji{font-size:6rem;animation:chestBounce 1s ease infinite}
+        @keyframes chestBounce{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-15px) rotate(-5deg)}75%{transform:translateY(-15px) rotate(5deg)}}
+        .chest-box .chest-text{color:#fff;font-size:1.5rem;font-weight:900;margin:15px 0;text-shadow:0 4px 20px rgba(0,0,0,.3)}
+        .chest-reveal{animation:chestReveal 1s cubic-bezier(.175,.885,.32,1.275) forwards}
+        @keyframes chestReveal{0%{transform:scale(0) rotate(-10deg);opacity:0}50%{transform:scale(1.3) rotate(5deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+        .collection-tab-btn{padding:8px 16px;border:2px solid var(--primary);background:#fff;border-radius:20px;font-weight:800;color:var(--primary);cursor:pointer;transition:all .3s;font-size:.8rem;font-family:'Nunito',sans-serif}
+        .collection-tab-btn.active{background:var(--primary);color:#fff}
+        /* Survival Mode */
+        .surv-arena{position:relative;width:100%;height:350px;background:linear-gradient(180deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);border-radius:var(--radius);overflow:hidden;margin-bottom:15px;touch-action:manipulation}
+        .surv-hud{position:absolute;top:0;left:0;width:100%;padding:10px 15px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+        .surv-hearts{font-size:1.3rem;letter-spacing:2px}
+        .surv-score-display{color:#fff;font-weight:900;font-size:.9rem}
+        .surv-combo-display{color:var(--accent);font-weight:900;font-size:.8rem}
+        .surv-word{position:absolute;left:50%;transform:translateX(-50%);font-size:clamp(1.3rem,4vw,1.8rem);font-weight:900;color:#fff;text-shadow:0 2px 15px rgba(108,92,231,.6),0 0 30px rgba(108,92,231,.3);z-index:3;transition:top .1s linear;text-align:center;padding:8px 20px;background:rgba(108,92,231,.25);border-radius:12px;border:2px solid rgba(108,92,231,.4);backdrop-filter:blur(4px);white-space:nowrap}
+        .surv-word.surv-hit{animation:survHit .4s ease forwards;color:var(--success);border-color:var(--success);background:rgba(0,184,148,.2);text-shadow:0 0 20px rgba(0,184,148,.6)}
+        .surv-word.surv-miss{animation:survMiss .4s ease forwards;color:var(--danger);border-color:var(--danger);background:rgba(225,112,85,.2)}
+        @keyframes survHit{0%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.3)}100%{transform:translateX(-50%) scale(0);opacity:0}}
+        @keyframes survMiss{0%{transform:translateX(-50%) scale(1);opacity:1}100%{transform:translateX(-50%) translateY(20px) scale(.5);opacity:0}}
+        .surv-ground{position:absolute;bottom:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,var(--danger),#ff7675,var(--danger));box-shadow:0 0 15px rgba(231,76,60,.5);z-index:4}
+        .surv-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+        .surv-opt{padding:14px 10px;background:#fff;border:2px solid #e2e8f0;border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;font-weight:800;font-size:.9rem;text-align:center;font-family:'Nunito',sans-serif;user-select:none;-webkit-user-select:none}
+        .surv-opt:hover{border-color:var(--primary);background:#EDE7F6}
+        .surv-opt:active{transform:scale(.95);background:#D1C4E9}
+        .surv-opt.surv-opt-correct{border-color:var(--success);background:#D5F5E3;color:var(--success)}
+        .surv-opt.surv-opt-wrong{border-color:var(--danger);background:#FDECEA;color:var(--danger);animation:wrongShake .4s ease}
+        .surv-stars{position:absolute;width:100%;height:100%;z-index:1;pointer-events:none}
+        .surv-star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:twinkle 2s infinite}
+        @keyframes twinkle{0%,100%{opacity:.3}50%{opacity:1}}
+        .surv-gameover{text-align:center;padding:20px}
+        .surv-gameover .go-emoji{font-size:4rem;margin-bottom:10px}
+        .surv-gameover h3{font-size:1.5rem;font-weight:900;color:var(--text-dark);margin-bottom:5px}
+        .surv-gameover .go-score{font-size:2.5rem;font-weight:900;color:var(--primary);margin:10px 0}
+        .surv-gameover .go-best{font-size:.9rem;color:var(--text-light);font-weight:700}
+        /* Interactive Animations */
+        .ia-scene{background:linear-gradient(180deg,#f0f4ff,#e8eeff);border-radius:var(--radius);padding:20px;min-height:200px;position:relative;overflow:hidden;margin-bottom:15px;border:2px solid #ddd}
+        .ia-controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+        .ia-ctrl-group{display:flex;flex-direction:column;align-items:center;gap:4px}
+        .ia-ctrl-label{font-weight:800;font-size:.75rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px}
+        .ia-pill{display:flex;gap:0;border-radius:25px;overflow:hidden;border:2px solid var(--primary)}
+        .ia-pill-btn{padding:8px 14px;font-weight:800;font-size:.8rem;cursor:pointer;border:none;background:#fff;color:var(--primary);font-family:'Nunito',sans-serif;transition:all .2s}
+        .ia-pill-btn.active{background:var(--primary);color:#fff}
+        /* Sentence Builder */
+        .sb-sentence{font-size:clamp(1.1rem,3.5vw,1.5rem);font-weight:800;text-align:center;padding:25px 15px;line-height:1.8;color:var(--text-dark)}
+        .sb-sentence .sb-highlight{display:inline-block;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:2px 10px;border-radius:8px;animation:sbPop .4s cubic-bezier(.175,.885,.32,1.275);margin:2px}
+        @keyframes sbPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+        .sb-sentence .sb-base{display:inline;transition:opacity .3s}
+        /* Dress-up */
+        .du-stage{display:flex;justify-content:center;align-items:flex-end;height:220px;position:relative}
+        .du-person{position:relative;width:100px;text-align:center}
+        .du-person .du-body{font-size:5rem;line-height:1}
+        .du-item{position:absolute;font-size:2rem;animation:duEquip .5s cubic-bezier(.175,.885,.32,1.275);transition:all .3s}
+        @keyframes duEquip{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+        .du-wardrobe{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:15px}
+        .du-item-btn{padding:10px 16px;background:#fff;border:2px solid #e2e8f0;border-radius:var(--radius-sm);cursor:pointer;font-weight:700;font-size:.85rem;transition:all .3s;font-family:'Nunito',sans-serif;text-align:center}
+        .du-item-btn:hover{border-color:var(--secondary);background:#FCE4EC}
+        .du-item-btn.equipped{border-color:var(--success);background:#D5F5E3}
+        .du-desc{text-align:center;margin-top:12px;font-weight:700;font-size:.95rem;color:var(--primary);min-height:24px;transition:all .3s}
+        /* Emotion Meter */
+        .em-meter{position:relative;height:30px;background:linear-gradient(90deg,#74b9ff,#55efc4,#fdcb6e,#e17055,#d63031);border-radius:15px;margin:15px 0;overflow:visible}
+        .em-needle{position:absolute;top:-8px;width:4px;height:46px;background:var(--text-dark);border-radius:4px;transition:left .8s cubic-bezier(.68,-.55,.27,1.55);box-shadow:0 0 8px rgba(0,0,0,.3)}
+        .em-needle::after{content:'▼';position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:.8rem;color:var(--text-dark)}
+        .em-labels{display:flex;justify-content:space-between;font-size:.7rem;font-weight:800;color:var(--text-light);margin-top:4px;padding:0 5px}
+        .em-face{font-size:4rem;text-align:center;transition:all .5s;margin:10px 0}
+        .em-word-display{text-align:center;font-size:1.3rem;font-weight:900;color:var(--primary);min-height:36px;margin:5px 0;transition:all .3s}
+        .em-word-btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+        .em-word-btn{padding:10px 18px;background:#fff;border:2px solid #e2e8f0;border-radius:var(--radius-sm);cursor:pointer;font-weight:800;font-size:.9rem;transition:all .3s;font-family:'Nunito',sans-serif}
+        .em-word-btn:hover{border-color:var(--primary);transform:translateY(-2px)}
+        .em-word-btn.em-selected{border-color:var(--primary);background:#EDE7F6}
+        /* Enhanced IA animations */
+        @keyframes sbKick{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-25deg)}}
+        @keyframes sbBallRoll{0%{cx:130}100%{cx:180}}
+        .sb-flash{position:absolute;font-size:clamp(.9rem,2.5vw,1.2rem);font-weight:900;animation:sbFlashIn .6s cubic-bezier(.175,.885,.32,1.275) forwards;pointer-events:none;text-shadow:0 2px 10px rgba(0,0,0,.2)}
+        @keyframes sbFlashIn{0%{transform:translateY(20px) scale(.5);opacity:0}60%{transform:translateY(-5px) scale(1.1);opacity:1}100%{transform:translateY(0) scale(1);opacity:1}}
+        .sb-ban{position:absolute;font-size:3rem;animation:sbBanIn .5s ease forwards;pointer-events:none}
+        @keyframes sbBanIn{0%{transform:scale(0) rotate(-30deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:.7}}
+        .sb-question{position:absolute;font-size:2.5rem;animation:sbQFloat 1.5s ease-in-out infinite;pointer-events:none}
+        @keyframes sbQFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+        /* Catwalk */
+        @keyframes catwalkWalk{0%{left:-15%}45%{left:42%}55%{left:42%}100%{left:105%}}
+        @keyframes duFlash{0%{opacity:0}50%{opacity:.6}100%{opacity:0}}
+        .du-catwalk-stage{position:relative;height:200px;background:linear-gradient(180deg,#1a1a2e,#2d3436);border-radius:var(--radius);overflow:hidden}
+        .du-catwalk-floor{position:absolute;bottom:0;left:0;width:100%;height:40%;background:linear-gradient(180deg,rgba(108,92,231,.3),rgba(108,92,231,.1));border-top:2px solid rgba(253,203,110,.4)}
+        .du-catwalk-lights{position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 0%,rgba(253,203,110,.15) 0%,transparent 60%);pointer-events:none}
+        .du-catwalk-char{position:absolute;bottom:30px;animation:catwalkWalk 5s ease-in-out forwards}
+        .du-flash-overlay{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;animation:duFlash .3s ease 2.3s,duFlash .3s ease 2.8s}
+        .du-applause{position:absolute;bottom:5px;width:100%;text-align:center;font-size:1.5rem;letter-spacing:8px;animation:fadeIn .5s ease 2.5s both}
+        /* Lab bubbles */
+        @keyframes labBubble{0%{transform:translateY(0) scale(1);opacity:.6}100%{transform:translateY(-80px) scale(.3);opacity:0}}
+        @keyframes labShake{0%,100%{transform:rotate(0)}25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
+        @keyframes labSteam{0%{transform:translateY(0) scaleX(1);opacity:.5}100%{transform:translateY(-30px) scaleX(1.5);opacity:0}}
+        .lab-bubble{position:absolute;border-radius:50%;border:1.5px solid rgba(255,255,255,.4);animation:labBubble 2s ease-in infinite;pointer-events:none}
+        .lab-steam{position:absolute;width:20px;height:10px;background:rgba(255,255,255,.4);border-radius:50%;animation:labSteam 1.5s ease-out infinite;pointer-events:none}
+        @keyframes conveyorMove{0%{background-position:0 0}100%{background-position:40px 0}}
         .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text-dark);color:#fff;padding:12px 24px;border-radius:50px;font-weight:800;font-size:.9rem;z-index:10000;transition:transform .4s cubic-bezier(.175,.885,.32,1.275);box-shadow:var(--shadow-lg);pointer-events:none;white-space:nowrap}
         .toast.show{transform:translateX(-50%) translateY(0)}
         @media(max-width:600px){.container{padding:10px}.header{padding:20px 10px 15px}.units-grid{grid-template-columns:1fr;gap:12px}.nav-tabs{gap:6px}.nav-tab{padding:8px 14px;font-size:.85rem}.unit-card{padding:15px}.modal-content{padding:15px}.quiz-container{padding:18px}.vocab-grid{grid-template-columns:1fr}.vocab-card-wrapper{height:180px}}
@@ -344,6 +510,7 @@
             <button class="nav-tab" onclick="showSection('practice',this)">📝 Luyện Tập</button>
             <button class="nav-tab" onclick="showSection('vocabulary',this)">🔤 Từ Vựng</button>
             <button class="nav-tab" onclick="showSection('report',this);renderReport()">📊 Báo Cáo</button>
+            <button class="nav-tab" onclick="showSection('collection',this);renderCollection()">🃏 Bộ Sưu Tập</button>
         </nav>
         <section id="semester1" class="section active">
             <div class="section-header"><span class="icon">📚</span><h2>Học Kì 1</h2></div>
@@ -369,6 +536,7 @@
             <div class="units-grid">
                 <div class="daily-card" onclick="startDailyChallenge()"><div class="daily-emoji">🔥</div><h3>Daily Challenge</h3><p>5 câu hỏi mỗi ngày · Bonus XP</p></div>
                 <div class="unit-card" onclick="startShadowChallenge()"><div class="unit-icon" style="background:linear-gradient(135deg,var(--accent),#F9CA24)">🎤</div><h3>Shadowing Challenge</h3><p>Nghe → Đọc theo · Luyện phát âm</p></div>
+                <div class="unit-card" onclick="startSurvival()"><div class="unit-icon" style="background:linear-gradient(135deg,#E17055,#D63031)">☄️</div><h3>Survival Mode</h3><p>Từ rơi từ trên xuống · Bấm đúng nghĩa · 3 mạng ❤️</p></div>
                 <div class="unit-card" onclick="startQuiz('grammar')"><div class="unit-icon">📐</div><h3>Grammar Practice</h3><p>Luyện ngữ pháp - Tenses, Passive, Modal verbs</p></div>
                 <div class="unit-card" onclick="startQuiz('vocabulary')"><div class="unit-icon">🔤</div><h3>Vocabulary Quiz</h3><p>Kiểm tra từ vựng theo chủ đề</p></div>
                 <div class="unit-card" onclick="startQuiz('mixed')"><div class="unit-icon">🎯</div><h3>Mixed Review</h3><p>Ôn tập tổng hợp tất cả kỹ năng</p></div>
@@ -390,11 +558,23 @@
                 <div class="unit-card" onclick="openVocab('entertainment')"><div class="unit-icon">📺</div><h3>Entertainment</h3><p>Giải trí & Truyền thông</p></div>
             </div>
         </section>
+        <section id="collection" class="section">
+            <div class="section-header"><span class="icon">🃏</span><h2>Bộ Sưu Tập Thẻ</h2></div>
+            <div id="collectionContent"></div>
+        </section>
         <section id="report" class="section">
             <div class="section-header"><span class="icon">📊</span><h2>Báo Cáo Học Tập</h2></div>
             <div id="reportContent"></div>
         </section>
-        <footer class="footer">English Fun · Friends Plus 8 · 2025<br><span style="font-size:.7rem;opacity:.7">Dữ liệu được lưu trên thiết bị này</span></footer>
+        <footer class="footer">
+            <div class="footer-card">
+                <div class="ft-teacher">👩‍🏫 Cô Thanh | 📱 Zalo: Thanhthanh</div>
+                <div class="ft-motto">"Vui học tiếng Anh - Tự tin giao tiếp"</div>
+                <div class="ft-qr"><img src="data:image/webp;base64,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" alt="QR Zalo"></div>
+                <div class="ft-scan">📲 Quét mã để kết bạn Zalo với cô Thanh</div>
+                <div class="ft-brand">English Fun · Friends Plus 8 · 2026<br>Dữ liệu được lưu trên thiết bị này</div>
+            </div>
+        </footer>
     </div>
 
     <div class="modal-overlay" id="unitModal" onclick="if(event.target===this)closeModal()">
@@ -416,6 +596,10 @@
             <div class="modal-header"><h2 id="gameTitle">Game</h2><p id="gameSub">Luyện tập</p><button class="modal-close" onclick="closeGameModal()">×</button></div>
             <div class="modal-content"><div class="quiz-container" id="gameContainer"></div></div>
         </div>
+    </div>
+
+    <div class="chest-overlay" id="chestOverlay" onclick="closeChest()">
+        <div class="chest-box" id="chestBox"></div>
     </div>
 
     <div class="levelup-overlay" id="levelUpOverlay" onclick="this.classList.remove('show')">
@@ -611,7 +795,130 @@ checkAnswer=function(sel){
 };
 
 // Init XP bar on load
-updateXPBar();
+// (init moved to end of script)
+
+// ===== CARD SKINS & ACHIEVEMENTS =====
+const SKINS=[
+// Common - easy to get
+{id:'c1',name:'First Step',emoji:'👣',rarity:'common',desc:'Hoàn thành bài học đầu tiên',check:()=>getXPData().xp>=10},
+{id:'c2',name:'Quiz Starter',emoji:'📝',rarity:'common',desc:'Hoàn thành 1 quiz',check:()=>getXPData().xp>=50},
+{id:'c3',name:'Shadow Beginner',emoji:'🎤',rarity:'common',desc:'Shadow 10 lần',check:()=>getTotalShadow()>=10},
+{id:'c4',name:'Day One',emoji:'📅',rarity:'common',desc:'Học ngày đầu tiên',check:()=>getStreakData().days.length>=1},
+{id:'c5',name:'Word Collector',emoji:'📚',rarity:'common',desc:'Luyện 5 từ vựng',check:()=>getTotalWords()>=5},
+{id:'c6',name:'Explorer',emoji:'🗺️',rarity:'common',desc:'Đạt Level 2',check:()=>getXPData().level>=2},
+// Rare - need effort
+{id:'r1',name:'Grammar Guru',emoji:'📐',rarity:'rare',desc:'Đạt 200 XP',check:()=>getXPData().xp>=200},
+{id:'r2',name:'Shadow Pro',emoji:'🎙️',rarity:'rare',desc:'Shadow 50 lần',check:()=>getTotalShadow()>=50},
+{id:'r3',name:'Week Warrior',emoji:'🔥',rarity:'rare',desc:'Streak 7 ngày',check:()=>getStreakData().current>=7},
+{id:'r4',name:'Vocabulary Master',emoji:'🔤',rarity:'rare',desc:'Luyện 20 từ vựng',check:()=>getTotalWords()>=20},
+{id:'r5',name:'Scholar',emoji:'🎓',rarity:'rare',desc:'Đạt Level 4',check:()=>getXPData().level>=4},
+{id:'r6',name:'Dedicated',emoji:'💪',rarity:'rare',desc:'Học 14 ngày',check:()=>getStreakData().days.length>=14},
+// Legendary - hard to get
+{id:'l1',name:'Shadow Legend',emoji:'👑',rarity:'legendary',desc:'Shadow 200 lần',check:()=>getTotalShadow()>=200},
+{id:'l2',name:'Unstoppable',emoji:'🔥',rarity:'legendary',desc:'Streak 30 ngày',check:()=>getStreakData().current>=30},
+{id:'l3',name:'Champion',emoji:'🏆',rarity:'legendary',desc:'Đạt 1000 XP',check:()=>getXPData().xp>=1000},
+{id:'l4',name:'Polyglot',emoji:'💎',rarity:'legendary',desc:'Luyện tất cả 40+ từ',check:()=>getTotalWords()>=40},
+{id:'l5',name:'Grandmaster',emoji:'🌟',rarity:'legendary',desc:'Đạt Level 7',check:()=>getXPData().level>=7},
+{id:'l6',name:'Devoted',emoji:'❤️',rarity:'legendary',desc:'Học 30 ngày',check:()=>getStreakData().days.length>=30}
+];
+
+function getTotalShadow(){return Object.values(JSON.parse(localStorage.getItem('shadowCounts')||'{}')).reduce((a,b)=>a+b,0)}
+function getTotalWords(){return Object.keys(JSON.parse(localStorage.getItem('shadowCounts')||'{}')).length}
+function getUnlockedSkins(){return JSON.parse(localStorage.getItem('unlockedSkins')||'[]')}
+function saveUnlockedSkins(arr){localStorage.setItem('unlockedSkins',JSON.stringify(arr))}
+
+function checkAchievements(silent){
+    const unlocked=getUnlockedSkins();let newUnlocks=[];
+    SKINS.forEach(s=>{
+        if(!unlocked.includes(s.id)&&s.check()){
+            unlocked.push(s.id);newUnlocks.push(s);
+        }
+    });
+    if(newUnlocks.length>0){
+        saveUnlockedSkins(unlocked);
+        if(!silent)showChestReveal(newUnlocks);
+    }
+}
+
+function showChestReveal(skins){
+    const ov=document.getElementById('chestOverlay');
+    const box=document.getElementById('chestBox');
+    const s=skins[0];
+    const rarityLabel={common:'Common',rare:'⭐ Rare',legendary:'👑 Legendary'}[s.rarity];
+    const rarityColor={common:'#94a3b8',rare:'#8b5cf6',legendary:'#d97706'}[s.rarity];
+    
+    box.innerHTML=`<div class="chest-emoji">🎁</div><div class="chest-text">Mở khóa thẻ mới!</div>`;
+    ov.classList.add('show');
+    
+    setTimeout(()=>{
+        if(s.rarity==='legendary'){spawnConfetti();spawnEmojiRain(['👑','💎','⭐','✨'],30)}
+        else if(s.rarity==='rare'){spawnEmojiRain(['⭐','✨','💫'],15)}
+        box.innerHTML=`
+            <div class="chest-reveal">
+                <div class="skin-card ${s.rarity}" style="width:180px;margin:0 auto;min-height:180px">
+                    <div class="skin-emoji" style="font-size:3rem">${s.emoji}</div>
+                    <div class="skin-name" style="font-size:1rem;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.3)">${s.name}</div>
+                    <div class="skin-rarity" style="color:${rarityColor};font-size:.8rem">${rarityLabel}</div>
+                </div>
+            </div>
+            <div class="chest-text" style="font-size:1.1rem;margin-top:15px">${s.desc}</div>
+            <p style="color:rgba(255,255,255,.6);font-size:.85rem;margin-top:10px">Bấm để đóng</p>`;
+        playCorrectSound();
+    },1200);
+    
+    if(skins.length>1){
+        window._pendingReveals=skins.slice(1);
+    }else{
+        window._pendingReveals=null;
+    }
+}
+
+function closeChest(){
+    if(window._pendingReveals&&window._pendingReveals.length>0){
+        showChestReveal(window._pendingReveals);return;
+    }
+    document.getElementById('chestOverlay').classList.remove('show');
+}
+
+function renderCollection(){
+    const unlocked=getUnlockedSkins();
+    const counts={common:0,rare:0,legendary:0};
+    const totals={common:0,rare:0,legendary:0};
+    SKINS.forEach(s=>{totals[s.rarity]++;if(unlocked.includes(s.id))counts[s.rarity]++});
+    
+    const el=document.getElementById('collectionContent');
+    let h=`<div style="text-align:center;margin-bottom:15px">
+        <p style="font-weight:800;font-size:1rem;color:#fff">🃏 ${unlocked.length}/${SKINS.length} thẻ đã mở khóa</p>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap">
+            <span style="background:#f8fafc;padding:4px 12px;border-radius:20px;font-weight:800;font-size:.75rem;color:#94a3b8">Common ${counts.common}/${totals.common}</span>
+            <span style="background:rgba(139,92,246,.15);padding:4px 12px;border-radius:20px;font-weight:800;font-size:.75rem;color:#8b5cf6">⭐ Rare ${counts.rare}/${totals.rare}</span>
+            <span style="background:rgba(253,203,110,.2);padding:4px 12px;border-radius:20px;font-weight:800;font-size:.75rem;color:#d97706">👑 Legendary ${counts.legendary}/${totals.legendary}</span>
+        </div>
+    </div>`;
+    
+    // Render by rarity
+    ['legendary','rare','common'].forEach(rarity=>{
+        const label={common:'📄 Common',rare:'⭐ Rare',legendary:'👑 Legendary'}[rarity];
+        const skinsByRarity=SKINS.filter(s=>s.rarity===rarity);
+        h+=`<div style="margin-bottom:20px"><h3 style="color:#fff;font-weight:900;font-size:1rem;margin-bottom:10px">${label}</h3><div class="skin-grid">`;
+        skinsByRarity.forEach(s=>{
+            const isUnlocked=unlocked.includes(s.id);
+            h+=`<div class="skin-card ${s.rarity} ${isUnlocked?'':'locked'}" onclick="${isUnlocked?'':''}">
+                <div class="skin-emoji">${s.emoji}</div>
+                <div class="skin-name">${isUnlocked?s.name:'???'}</div>
+                <div class="skin-rarity">${{common:'Common',rare:'Rare',legendary:'Legendary'}[s.rarity]}</div>
+                <div class="skin-req">${isUnlocked?'✅ Đã mở':'🔒 '+s.desc}</div>
+            </div>`;
+        });
+        h+=`</div></div>`;
+    });
+    
+    el.innerHTML=h;
+}
+
+// Hook achievement check into XP gain
+const _origAddXP=addXP;
+addXP=function(amount,reason){_origAddXP(amount,reason);checkAchievements(false)};
 
 // ===== REPORT CARD =====
 function getStudentName(){return localStorage.getItem('studentName')||''}
@@ -720,69 +1027,79 @@ function toggleVietnamese(show){
 
 // ===== SPEECH =====
 let speechRate=0.85,currentUtterance=null,currentAudio=null;
-var hasRV=(typeof responsiveVoice!=='undefined');
-var hasSpeech=(typeof window!=='undefined'&&'speechSynthesis' in window&&window.speechSynthesis!=null);
+var hasRV=false;
+var hasSpeech=(typeof window!=="undefined"&&"speechSynthesis" in window&&window.speechSynthesis!=null);
+var audioUnlocked=false;
+
+function unlockAudio(){
+    if(audioUnlocked)return;audioUnlocked=true;
+    try{var ctx=new(window.AudioContext||window.webkitAudioContext)();var buf=ctx.createBuffer(1,1,22050);var src=ctx.createBufferSource();src.buffer=buf;src.connect(ctx.destination);if(src.start)src.start(0);setTimeout(function(){try{ctx.close()}catch(e){}},100)}catch(e){}
+}
+document.addEventListener("touchstart",unlockAudio,{once:true});
+document.addEventListener("click",unlockAudio,{once:true});
 
 function stopSpeech(){
     try{if(hasRV)responsiveVoice.cancel()}catch(e){}
     try{if(hasSpeech)window.speechSynthesis.cancel()}catch(e){}
     try{if(currentAudio){currentAudio.pause();currentAudio.currentTime=0;currentAudio=null}}catch(e){}
-    document.querySelectorAll('.speak-btn.speaking').forEach(function(b){b.classList.remove('speaking')});
+    document.querySelectorAll(".speak-btn.speaking").forEach(function(b){b.classList.remove("speaking")});
 }
 
-// Layer 3: Google Translate TTS (last resort)
-function speakWithGoogleTTS(text,btn,onEnd){
+// Oddcast TTS - works on most mobile browsers
+function speakWithOddcast(text,btn,onEnd){
     try{
-        var shortText=text.substring(0,200);
-        var url='https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q='+encodeURIComponent(shortText);
+        stopSpeech();
+        var shortText=text.substring(0,300);
+        var url="https://cache-a.oddcast.com/tts/genB.php?EID=2&LID=1&VID=2&TXT="+encodeURIComponent(shortText)+"&IS_UTF8=1&ACC=3314795&API=2292376&SESSION=default&cache_flag=3";
         var audio=new Audio(url);
         currentAudio=audio;
-        if(btn)btn.classList.add('speaking');
-        audio.onended=function(){if(btn)btn.classList.remove('speaking');currentAudio=null;if(onEnd)onEnd()};
-        audio.onerror=function(){if(btn)btn.classList.remove('speaking');currentAudio=null;if(onEnd)onEnd()};
-        audio.play().catch(function(){if(btn)btn.classList.remove('speaking');currentAudio=null;if(onEnd)onEnd()});
-    }catch(e){if(btn)btn.classList.remove('speaking');if(onEnd)onEnd()}
+        if(btn)btn.classList.add("speaking");
+        audio.onended=function(){if(btn)btn.classList.remove("speaking");currentAudio=null;if(onEnd)onEnd()};
+        audio.onerror=function(){if(btn)btn.classList.remove("speaking");currentAudio=null;if(onEnd)onEnd()};
+        audio.load();
+        var p=audio.play();
+        if(p)p.catch(function(){if(btn)btn.classList.remove("speaking");currentAudio=null;if(onEnd)onEnd()});
+    }catch(e){if(btn)btn.classList.remove("speaking");if(onEnd)onEnd()}
 }
 
-// Layer 2: Browser speechSynthesis
+// Browser speechSynthesis
 function speakWithBrowser(text,btn,onEnd){
-    if(!hasSpeech){speakWithGoogleTTS(text,btn,onEnd);return}
+    if(!hasSpeech){speakWithOddcast(text,btn,onEnd);return}
     try{
-        var u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=speechRate;u.pitch=1;
+        window.speechSynthesis.cancel();
+        var u=new SpeechSynthesisUtterance(text);u.lang="en-US";u.rate=speechRate;u.pitch=1;u.volume=1;
         var voices=window.speechSynthesis.getVoices();
-        var v=voices.find(function(v){return v.lang.startsWith('en')&&v.name.includes('Female')})||voices.find(function(v){return v.lang.startsWith('en-US')})||voices.find(function(v){return v.lang.startsWith('en')});
+        var v=voices.find(function(x){return x.lang.startsWith("en")&&x.name.includes("Female")})||voices.find(function(x){return x.lang.startsWith("en-US")})||voices.find(function(x){return x.lang.startsWith("en")});
         if(v)u.voice=v;
-        if(btn)btn.classList.add('speaking');
-        u.onend=function(){if(btn)btn.classList.remove('speaking');if(onEnd)onEnd()};
-        u.onerror=function(){if(btn)btn.classList.remove('speaking');speakWithGoogleTTS(text,btn,onEnd)};
+        if(btn)btn.classList.add("speaking");
+        var ended=false;
+        var rt=setInterval(function(){if(!window.speechSynthesis.speaking){clearInterval(rt);return}window.speechSynthesis.pause();window.speechSynthesis.resume()},10000);
+        u.onend=function(){clearInterval(rt);if(ended)return;ended=true;if(btn)btn.classList.remove("speaking");if(onEnd)onEnd()};
+        u.onerror=function(){clearInterval(rt);if(ended)return;ended=true;if(btn)btn.classList.remove("speaking");speakWithOddcast(text,btn,onEnd)};
         window.speechSynthesis.speak(u);currentUtterance=u;
-    }catch(e){speakWithGoogleTTS(text,btn,onEnd)}
+    }catch(e){speakWithOddcast(text,btn,onEnd)}
 }
 
-// Layer 1: ResponsiveVoice (primary - best quality)
+// Main speak function
 function speak(text,btn,onEnd){
-    stopSpeech();
-    if(btn)btn.classList.add('speaking');
-    if(hasRV){
-        try{
-            responsiveVoice.speak(text,"US English Female",{
-                rate:speechRate,
-                onend:function(){if(btn)btn.classList.remove('speaking');if(onEnd)onEnd()},
-                onerror:function(){if(btn)btn.classList.remove('speaking');speakWithBrowser(text,btn,onEnd)}
-            });
-        }catch(e){speakWithBrowser(text,btn,onEnd)}
+    stopSpeech();unlockAudio();
+    if(btn)btn.classList.add("speaking");
+    var isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if(isMobile){
+        // Mobile: Oddcast first (proven to work), fallback to browser then RV
+        speakWithOddcast(text,btn,onEnd);
     }else{
-        speakWithBrowser(text,btn,onEnd);
+        // Desktop: ResponsiveVoice > speechSynthesis > Oddcast
+        if(hasRV){
+            try{responsiveVoice.speak(text,"US English Female",{rate:speechRate,onend:function(){if(btn)btn.classList.remove("speaking");if(onEnd)onEnd()},onerror:function(){if(btn)btn.classList.remove("speaking");speakWithBrowser(text,btn,onEnd)}})}catch(e){speakWithBrowser(text,btn,onEnd)}
+        }else{speakWithBrowser(text,btn,onEnd)}
     }
 }
 
-// Init voices
 if(hasSpeech){try{window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices()}}catch(e){}}
-// Check RV loaded after delay
-setTimeout(function(){hasRV=(typeof responsiveVoice!=='undefined')},2000);
+setTimeout(function(){hasRV=(typeof responsiveVoice!=="undefined")},3000);
 
-// Safe speak from data attribute - avoids inline quote escaping issues
-function speakData(btn){var t=btn.getAttribute('data-speak');if(t)speak(t,btn)}
+function speakData(btn){var t=btn.getAttribute("data-speak");if(t)speak(t,btn)}
 function speakDataStop(btn){event.stopPropagation();speakData(btn)}
 
 // ===== SOUND FX =====
@@ -795,6 +1112,65 @@ function playShadowSound(){try{const c=getAudioCtx(),o=c.createOscillator(),g=c.
 // ===== CONFETTI =====
 function spawnConfetti(){const c=document.getElementById('confettiContainer'),colors=['#6C5CE7','#FD79A8','#FDCB6E','#00B894','#0984E3','#E17055','#55EFC4'];for(let i=0;i<40;i++){const p=document.createElement('div');p.className='confetti-piece';p.style.left=Math.random()*100+'%';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDelay=Math.random()*1.5+'s';p.style.animationDuration=(2+Math.random()*2)+'s';p.style.borderRadius=Math.random()>.5?'50%':'2px';p.style.width=(6+Math.random()*8)+'px';p.style.height=(6+Math.random()*8)+'px';c.appendChild(p)}setTimeout(()=>c.innerHTML='',4000)}
 
+// ===== EMOJI RAIN =====
+function spawnEmojiRain(emojis,count){
+    count=count||20;
+    for(let i=0;i<count;i++){
+        const el=document.createElement('div');
+        el.className='emoji-rain';
+        el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+        el.style.left=Math.random()*100+'%';
+        el.style.animationDelay=Math.random()*1.5+'s';
+        el.style.animationDuration=(2+Math.random()*1.5)+'s';
+        el.style.fontSize=(1.2+Math.random()*1)+'rem';
+        document.body.appendChild(el);
+        setTimeout(()=>el.remove(),4000);
+    }
+}
+
+// ===== PARTICLE BURST =====
+function spawnParticles(x,y,color){
+    const colors=color?[color]:['#6C5CE7','#FD79A8','#FDCB6E','#00B894','#55EFC4'];
+    for(let i=0;i<12;i++){
+        const p=document.createElement('div');
+        p.className='particle';
+        p.style.left=x+'px';p.style.top=y+'px';
+        p.style.background=colors[Math.floor(Math.random()*colors.length)];
+        const angle=Math.random()*Math.PI*2;
+        const dist=40+Math.random()*60;
+        const tx=Math.cos(angle)*dist;
+        const ty=Math.sin(angle)*dist;
+        p.style.setProperty('--tx',tx+'px');p.style.setProperty('--ty',ty+'px');
+        p.style.animation=`particleBurst .8s ease-out forwards`;
+        p.style.transform=`translate(${tx}px,${ty}px)`;
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(),1000);
+    }
+}
+
+// ===== COMBO SYSTEM =====
+let comboCount=0,comboTimer=null;
+function addCombo(){
+    comboCount++;
+    clearTimeout(comboTimer);
+    comboTimer=setTimeout(()=>{comboCount=0},8000);
+    if(comboCount>=3){
+        showCombo(comboCount);
+        if(comboCount===3)spawnEmojiRain(['⭐','✨','🎉'],15);
+        if(comboCount===5)spawnEmojiRain(['🔥','⭐','💫','✨'],25);
+        if(comboCount===10){spawnEmojiRain(['🏆','👑','💎','🔥','⭐'],35);spawnConfetti()}
+    }
+}
+function resetCombo(){comboCount=0;clearTimeout(comboTimer)}
+function showCombo(n){
+    const el=document.createElement('div');
+    el.className='combo-display';
+    el.style.fontSize=Math.min(3+n*0.3,6)+'rem';
+    el.innerHTML=n>=10?'🔥 '+n+'x COMBO! 🔥':n>=5?'⭐ '+n+'x COMBO!':''+n+'x Combo!';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),1200);
+}
+
 // ===== TOAST =====
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 
@@ -804,7 +1180,7 @@ function addShadowCount(w){const d=JSON.parse(localStorage.getItem('shadowCounts
 
 // ===== DATA =====
 const unitsData={
-starter:{title:"Starter Unit",subtitle:"Ôn tập kiến thức cơ bản",lessons:[{icon:"🔤",title:"Vocabulary Review",desc:"Ôn tập từ vựng lớp 7",status:"📖"},{icon:"📐",title:"Grammar Review",desc:"Present, Past, Future tenses",status:"📖"},{icon:"🎧",title:"Listening Practice",desc:"Luyện nghe cơ bản",status:"📖"},{icon:"✍️",title:"Writing Skills",desc:"Kỹ năng viết cơ bản",status:"📖"}],grammar:{title:"📐 Grammar Review",content:"Ôn tập các thì: Present Simple, Present Continuous, Past Simple",example:"I study English every day.|I am studying now."}},
+starter:{title:"Starter Unit",subtitle:"Ôn tập kiến thức cơ bản",lessons:[{icon:"🔤",title:"Vocabulary Review",desc:"Ôn tập từ vựng lớp 7",status:"📖"},{icon:"📐",title:"Grammar Review",desc:"Present, Past, Future tenses",status:"📖"},{icon:"🎧",title:"Listening Practice",desc:"Luyện nghe cơ bản",status:"📖"},{icon:"✍️",title:"Writing Skills",desc:"Kỹ năng viết cơ bản",status:"📖"},{icon:"🔧",title:"Máy Dựng Câu",desc:"Tương tác: xem câu biến đổi theo thì",status:"📖"}],grammar:{title:"📐 Grammar Review",content:"Ôn tập các thì: Present Simple, Present Continuous, Past Simple",example:"I study English every day.|I am studying now."}},
 unit1:{title:"Unit 1: Fads and Fashions",subtitle:"Xu hướng & Thời trang",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Fashion & clothing items",status:"📖"},{icon:"📖",title:"Reading",desc:"Fashion trends through history",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Past Simple & Past Continuous",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Shopping for clothes",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Used to",status:"📖"},{icon:"💬",title:"Speaking",desc:"Discussing fashion",status:"📖"},{icon:"✍️",title:"Writing",desc:"A description of a photo",status:"📖"},{icon:"📖",title:"Reading 2",desc:"TikTok and fast trends",status:"📖"},{icon:"📖",title:"Reading 3",desc:"School uniforms debate",status:"📖"}],grammar:{title:"📐 Past Simple vs Past Continuous",content:"Past Simple: hành động hoàn thành trong quá khứ<br>Past Continuous: hành động đang diễn ra tại thời điểm trong quá khứ",example:"While I was walking, I met an old friend."}},
 unit2:{title:"Unit 2: Sensations",subtitle:"Cảm giác & Giác quan",lessons:[{icon:"🔤",title:"Vocabulary",desc:"The five senses",status:"📖"},{icon:"📖",title:"Reading",desc:"Sensory experiences",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Adjectives -ed/-ing",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Describing feelings",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Comparative & Superlative",status:"📖"},{icon:"💬",title:"Speaking",desc:"Expressing opinions",status:"📖"},{icon:"✍️",title:"Writing",desc:"A review",status:"📖"},{icon:"📖",title:"Reading 2",desc:"Music and goosebumps",status:"📖"}],grammar:{title:"📐 Adjectives: -ed vs -ing",content:"-ed: cảm xúc của người (how you feel)<br>-ing: đặc điểm của vật/việc (what causes the feeling)",example:"I am bored.|This film is boring."}},
 unit3:{title:"Unit 3: Adventure",subtitle:"Phiêu lưu & Khám phá",lessons:[{icon:"🔤",title:"Vocabulary",desc:"Adventure activities",status:"📖"},{icon:"📖",title:"Reading",desc:"Extreme sports",status:"📖"},{icon:"📐",title:"Language Focus 1",desc:"Present Perfect",status:"📖"},{icon:"🎧",title:"Vocabulary & Listening",desc:"Travel experiences",status:"📖"},{icon:"📐",title:"Language Focus 2",desc:"Present Perfect vs Past Simple",status:"📖"},{icon:"💬",title:"Speaking",desc:"Talking about experiences",status:"📖"},{icon:"✍️",title:"Writing",desc:"A blog post",status:"📖"},{icon:"📖",title:"Reading 2",desc:"Lost in the Amazon",status:"📖"},{icon:"📖",title:"Reading 3",desc:"A teen on Everest",status:"📖"}],grammar:{title:"📐 Present Perfect",content:"Cấu trúc: have/has + V3 (past participle)<br>Dùng để nói về trải nghiệm, hành động vừa xảy ra",example:"I have visited Paris twice."}},
@@ -928,10 +1304,41 @@ let currentQuiz=[],currentQuestionIndex=0,score=0,answered=false;
 function showSection(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');stopSpeech()}
 
 // ===== UNIT MODAL =====
+// ===== UNIT THEME COLORS =====
+const unitThemes={
+starter:{gradient:'linear-gradient(135deg,#6C5CE7,#A29BFE)',emojis:['🌟','📚','✏️','🎒','📝','🔤']},
+unit1:{gradient:'linear-gradient(135deg,#FD79A8,#E84393)',emojis:['👗','👠','💍','👜','🧣','✨']},
+unit2:{gradient:'linear-gradient(135deg,#00B894,#00CEC9)',emojis:['👀','👂','👃','👅','🤚','💫']},
+unit3:{gradient:'linear-gradient(135deg,#0984E3,#74B9FF)',emojis:['⛰️','🪂','🧗','🌊','🏕️','🗺️']},
+unit4:{gradient:'linear-gradient(135deg,#FDCB6E,#E17055)',emojis:['💎','💰','🧶','♻️','🛒','🏭']},
+unit5:{gradient:'linear-gradient(135deg,#6C5CE7,#0984E3)',emojis:['🚀','🤖','💻','🔮','🌍','⚡']},
+unit6:{gradient:'linear-gradient(135deg,#00B894,#55EFC4)',emojis:['📚','🎓','📝','📋','🏫','✏️']},
+unit7:{gradient:'linear-gradient(135deg,#FDCB6E,#F9CA24)',emojis:['💡','🔬','🧪','📱','🤖','🚀']},
+unit8:{gradient:'linear-gradient(135deg,#E17055,#D63031)',emojis:['🎬','🍿','📺','🎥','🎭','⭐']}
+};
+function applyUnitTheme(id){
+    const theme=unitThemes[id];
+    const header=document.querySelector('#unitModal .modal-header');
+    if(header&&theme)header.style.background=theme.gradient;
+}
+function injectThemeEmojis(id){
+    const theme=unitThemes[id];
+    const mc=document.getElementById('modalContent');
+    if(mc&&theme){
+        const existing=mc.querySelector('.modal-bg-emojis');
+        if(existing)existing.remove();
+        const wrap=document.createElement('div');
+        wrap.className='modal-bg-emojis';
+        theme.emojis.forEach(e=>{const s=document.createElement('span');s.textContent=e;wrap.appendChild(s)});
+        mc.prepend(wrap);
+    }
+}
+
 function openUnit(id){
     const u=unitsData[id];if(!u)return;
     document.getElementById('modalTitle').textContent=u.title;
     document.getElementById('modalSubtitle').textContent=u.subtitle;
+    applyUnitTheme(id);
     let c='<div class="lesson-list">';
     u.lessons.forEach((l,i)=>{
         const hasContent=lessonContent[id]&&lessonContent[id][i];
@@ -948,6 +1355,7 @@ function openUnit(id){
     c+=`<div class="quiz-nav"><button class="quiz-btn primary" onclick="closeModal();startQuiz('grammar')">🎯 Làm bài tập (30 câu)</button></div>`;
     document.getElementById('modalContent').innerHTML=c;
     document.getElementById('unitModal').classList.add('active');
+    injectThemeEmojis(id);
 }
 function closeModal(){document.getElementById('unitModal').classList.remove('active');stopSpeech()}
 
@@ -976,14 +1384,16 @@ function checkAnswer(sel){
     if(answered)return;answered=true;
     const q=currentQuiz[currentQuestionIndex],opts=document.querySelectorAll('.quiz-option'),fb=document.getElementById('quizFeedback');
     opts.forEach((o,i)=>{o.classList.add('disabled');if(i===q.correct)o.classList.add('correct');else if(i===sel&&sel!==q.correct)o.classList.add('wrong')});
-    if(sel===q.correct){score++;playCorrectSound();fb.className='quiz-feedback correct show';fb.innerHTML=`<div class="fb-title">✅ Chính xác!</div><div class="fb-text">${q.explanation}</div>`}
-    else{playWrongSound();fb.className='quiz-feedback wrong show';fb.innerHTML=`<div class="fb-title">❌ Chưa đúng!</div><div class="fb-text"><b>Đáp án đúng:</b> ${q.options[q.correct]}</div><div class="fb-explain">${q.explanation}</div>`}
+    if(sel===q.correct){score++;playCorrectSound();addCombo();
+        const rect=opts[sel].getBoundingClientRect();spawnParticles(rect.left+rect.width/2,rect.top+rect.height/2);
+        fb.className='quiz-feedback correct show';fb.innerHTML=`<div class="fb-title">✅ Chính xác!</div><div class="fb-text">${q.explanation}</div>`}
+    else{playWrongSound();resetCombo();fb.className='quiz-feedback wrong show';fb.innerHTML=`<div class="fb-title">❌ Chưa đúng!</div><div class="fb-text"><b>Đáp án đúng:</b> ${q.options[q.correct]}</div><div class="fb-explain">${q.explanation}</div>`}
     setTimeout(()=>{currentQuestionIndex++;showQuestion()},2500);
 }
 function showResult(){
     const pct=Math.round(score/currentQuiz.length*100);let stars='',msg='',emoji='';
-    if(pct>=90){stars='⭐⭐⭐⭐⭐';msg='Xuất sắc! Bạn giỏi lắm!';emoji='🏆';spawnConfetti()}
-    else if(pct>=80){stars='⭐⭐⭐⭐';msg='Giỏi lắm! Tiếp tục phát huy!';emoji='🎉';spawnConfetti()}
+    if(pct>=90){stars='⭐⭐⭐⭐⭐';msg='Xuất sắc! Bạn giỏi lắm!';emoji='🏆';spawnConfetti();spawnEmojiRain(['🏆','⭐','👑','💎'],30)}
+    else if(pct>=80){stars='⭐⭐⭐⭐';msg='Giỏi lắm! Tiếp tục phát huy!';emoji='🎉';spawnConfetti();spawnEmojiRain(['🎉','⭐','✨'],20)}
     else if(pct>=70){stars='⭐⭐⭐';msg='Khá tốt! Cố gắng thêm nhé!';emoji='👏'}
     else if(pct>=50){stars='⭐⭐';msg='Được rồi! Ôn tập thêm nha!';emoji='💪'}
     else{stars='⭐';msg='Cần cố gắng hơn! Học lại nhé!';emoji='📚'}
@@ -997,6 +1407,9 @@ function closeQuizModal(){document.getElementById('quizModal').classList.remove(
 function openVocab(topic){
     const vocab=vocabularyData[topic];if(!vocab)return;
     const names={fashion:"Fashion & Clothing",senses:"Senses & Feelings",adventure:"Adventure & Travel",materials:"Materials & Money",education:"Education",technology:"Technology",entertainment:"Entertainment"};
+    const topicToUnit={fashion:'unit1',senses:'unit2',adventure:'unit3',materials:'unit4',education:'unit6',technology:'unit7',entertainment:'unit8'};
+    const unitId=topicToUnit[topic]||'starter';
+    applyUnitTheme(unitId);
     document.getElementById('modalTitle').textContent=names[topic];
     document.getElementById('modalSubtitle').textContent=`${vocab.length} từ vựng · Bấm thẻ để lật`;
     let c=`<div class="speed-control"><label>🔊 Tốc độ:</label><button class="speed-btn" onclick="setSpeed(0.5,this)">Chậm</button><button class="speed-btn active" onclick="setSpeed(0.85,this)">Vừa</button><button class="speed-btn" onclick="setSpeed(1.1,this)">Nhanh</button></div>`;
@@ -1023,6 +1436,7 @@ function openVocab(topic){
     c+=`<div class="quiz-nav"><button class="shadow-all-btn" onclick="shadowAll('${topic}')">🎤 Shadow tất cả từ</button><button class="quiz-btn primary" onclick="closeModal();startQuiz('vocabulary')">🎯 Kiểm tra từ vựng</button></div>`;
     document.getElementById('modalContent').innerHTML=c;
     document.getElementById('unitModal').classList.add('active');
+    injectThemeEmojis(unitId);
 }
 function setSpeed(r,btn){speechRate=r;document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
 function doShadow(word,topic,idx,btn){
@@ -1089,7 +1503,8 @@ questions:[
 topic:"Write a short paragraph (50-80 words) about your daily routine.",
 tips:["Start with what time you wake up","Describe 3-4 main activities","Use Present Simple tense","Use time expressions: in the morning, after school, in the evening"],
 useful_words:["wake up","have breakfast","go to school","study","do homework","watch TV","go to bed"],
-sample:"I usually wake up at 6:30 in the morning. After breakfast, I go to school by bike. I study from 7:00 to 11:30. After school, I have lunch and take a short nap. In the afternoon, I do my homework and play with my friends. I go to bed at 10 o'clock."}
+sample:"I usually wake up at 6:30 in the morning. After breakfast, I go to school by bike. I study from 7:00 to 11:30. After school, I have lunch and take a short nap. In the afternoon, I do my homework and play with my friends. I go to bed at 10 o'clock."},
+4:{type:"interactive",title:"Máy Dựng Câu",render:renderSentenceBuilder,onMount:sbRender}
 },
 unit1:{
 0:{type:"vocabulary",title:"Vocabulary: Fashion",words:[
@@ -1805,6 +2220,7 @@ questions:[
 function openLesson(unitId,lessonIdx){
     const lc=lessonContent[unitId]&&lessonContent[unitId][lessonIdx];
     if(!lc){showToast('Nội dung đang được cập nhật!');return}
+    applyUnitTheme(unitId);
     const mc=document.getElementById('modalContent');
     let h=`<button class="lesson-back-btn" onclick="openUnit('${unitId}')">← Quay lại</button>`;
     
@@ -1814,8 +2230,11 @@ function openLesson(unitId,lessonIdx){
     else if(lc.type==='listening') h+=renderListeningLesson(lc);
     else if(lc.type==='speaking') h+=renderSpeakingLesson(lc);
     else if(lc.type==='writing') h+=renderWritingLesson(lc);
+    else if(lc.type==='interactive') h+=lc.render();
     
     mc.innerHTML=h;
+    injectThemeEmojis(unitId);
+    if(lc.type==='interactive'&&lc.onMount)setTimeout(lc.onMount,100);
 }
 
 function renderVocabLesson(lc){
@@ -1840,7 +2259,6 @@ function renderReadingLesson(lc){
     const qId='rdq_'+Date.now();
     const passageId='rp_'+Date.now();
     let h=`<div class="reading-passage" id="${passageId}"><div class="passage-title">📖 ${lc.title} <button class="toggle-vi-btn" onclick="togglePassageVi('${passageId}',this)">🇻🇳 Ẩn TV</button></div>`;
-    // Split passage into sentences and show bilingual
     if(lc.passageVi){
         var enSents=lc.passage.match(/[^.!?]+[.!?]+/g)||[lc.passage];
         var viSents=lc.passageVi.match(/[^.!?]+[.!?]+/g)||[lc.passageVi];
@@ -1864,13 +2282,7 @@ function renderReadingLesson(lc){
     });
     return h;
 }
-
-function togglePassageVi(id,btn){
-    var el=document.getElementById(id);
-    if(!el)return;
-    el.classList.toggle('hide-vi');
-    btn.textContent=el.classList.contains('hide-vi')?'🇻🇳 Hiện TV':'🇻🇳 Ẩn TV';
-}
+function togglePassageVi(id,btn){var el=document.getElementById(id);if(!el)return;el.classList.toggle('hide-vi');btn.textContent=el.classList.contains('hide-vi')?'🇻🇳 Hiện TV':'🇻🇳 Ẩn TV'}
 
 function checkReadingAns(el,sel,correct){
     const parent=el.parentElement;
@@ -1879,7 +2291,9 @@ function checkReadingAns(el,sel,correct){
     const exp=parent.dataset.exp||'';
     const opts=parent.querySelectorAll('.quiz-option');
     opts.forEach((o,i)=>{o.classList.add('disabled');if(i===correct)o.classList.add('correct');else if(i===sel&&sel!==correct)o.classList.add('wrong')});
-    if(sel===correct){playCorrectSound();addXP(10,'')}else playWrongSound();
+    if(sel===correct){playCorrectSound();addXP(10,'');addCombo();
+        const rect=el.getBoundingClientRect();spawnParticles(rect.left+rect.width/2,rect.top+rect.height/2);
+    }else{playWrongSound();resetCombo()}
     if(exp){
         const fb=document.createElement('div');
         fb.className=sel===correct?'quiz-feedback correct show':'quiz-feedback wrong show';
@@ -1917,8 +2331,10 @@ function checkGrammarAns(parentId,sel,correct){
     const fbId=parentId.replace('gex_','gfb_');
     opts.forEach((o,i)=>{o.classList.add('disabled');if(i===correct)o.classList.add('correct');else if(i===sel&&sel!==correct)o.classList.add('wrong')});
     const fb=document.getElementById(fbId);
-    if(sel===correct){playCorrectSound();addXP(10,'');fb.innerHTML=`<div class="quiz-feedback correct show" style="display:block;margin-top:8px"><div class="fb-title">✅ Đúng!</div><div class="fb-text">${exp}</div></div>`}
-    else{playWrongSound();fb.innerHTML=`<div class="quiz-feedback wrong show" style="display:block;margin-top:8px"><div class="fb-title">❌ Sai!</div><div class="fb-text">${exp}</div></div>`}
+    if(sel===correct){playCorrectSound();addXP(10,'');addCombo();
+        const correctEl=opts[correct];const rect=correctEl.getBoundingClientRect();spawnParticles(rect.left+rect.width/2,rect.top+rect.height/2);
+        fb.innerHTML=`<div class="quiz-feedback correct show" style="display:block;margin-top:8px"><div class="fb-title">✅ Đúng!</div><div class="fb-text">${exp}</div></div>`}
+    else{playWrongSound();resetCombo();fb.innerHTML=`<div class="quiz-feedback wrong show" style="display:block;margin-top:8px"><div class="fb-title">❌ Sai!</div><div class="fb-text">${exp}</div></div>`}
 }
 
 function renderListeningLesson(lc){
@@ -1990,8 +2406,847 @@ function renderWritingLesson(lc){
     return h;
 }
 
+// ===== INTERACTIVE ANIMATIONS (Polished v2) =====
+
+// --- Sentence Builder: "Grammar Movie" ---
+function renderSentenceBuilder(){
+    const data={
+        present:{pos:{I:'I play',She:'She plays',They:'They play'},neg:{I:'I do not play',She:'She does not play',They:'They do not play'},q:{I:'Do I play',She:'Does she play',They:'Do they play'}},
+        past:{pos:{I:'I played',She:'She played',They:'They played'},neg:{I:'I did not play',She:'She did not play',They:'They did not play'},q:{I:'Did I play',She:'Did she play',They:'Did they play'}},
+        future:{pos:{I:'I will play',She:'She will play',They:'They will play'},neg:{I:'I will not play',She:'She will not play',They:'They will not play'},q:{I:'Will I play',She:'Will she play',They:'Will they play'}}
+    };
+    window._sbData=data;window._sbState={tense:'present',form:'pos',subject:'I'};
+    let h='<h3 style="font-weight:900;font-size:1.15rem;margin-bottom:6px;text-align:center">🎬 Phim Ngắn Ngữ Pháp</h3>';
+    h+='<p style="text-align:center;font-size:.82rem;color:var(--text-light);font-weight:600;margin-bottom:12px">Đổi Thì / Dạng câu → Xem nhân vật phản ứng!</p>';
+    h+='<div class="ia-scene" id="sbScene" style="text-align:center;padding:15px 10px;background:linear-gradient(180deg,#74b9ff 0%,#a29bfe 30%,#55efc4 92%,#00b894);min-height:280px;position:relative;overflow:hidden">';
+    h+='<div style="position:absolute;bottom:0;left:0;width:100%;height:30px;background:#00b894"></div>';
+    h+='<svg viewBox="0 0 240 250" width="120" style="display:block;margin:0 auto;position:relative;z-index:2" id="sbSvg">';
+    h+='<circle cx="120" cy="50" r="32" fill="#FDCB6E" stroke="#F9CA24" stroke-width="2.5"/>';
+    h+='<circle cx="108" cy="43" r="4.5" fill="#2D3436"/><circle cx="132" cy="43" r="4.5" fill="#2D3436"/>';
+    h+='<path id="sbMouth" d="M105 60 Q120 73 135 60" fill="none" stroke="#2D3436" stroke-width="3" stroke-linecap="round"/>';
+    h+='<rect x="95" y="87" width="50" height="55" rx="10" fill="#6C5CE7"/>';
+    h+='<line id="sbArmL" x1="95" y1="97" x2="68" y2="130" stroke="#FDCB6E" stroke-width="9" stroke-linecap="round"/>';
+    h+='<line id="sbArmR" x1="145" y1="97" x2="172" y2="130" stroke="#FDCB6E" stroke-width="9" stroke-linecap="round"/>';
+    h+='<rect id="sbLegL" x="100" y="142" width="16" height="50" rx="7" fill="#2D3436"><animate attributeName="transform" values="rotate(0,108,142);rotate(-15,108,142);rotate(0,108,142);rotate(15,108,142);rotate(0,108,142)" dur="0.8s" repeatCount="indefinite" id="sbLegLAnim"/></rect>';
+    h+='<rect id="sbLegR" x="124" y="142" width="16" height="50" rx="7" fill="#2D3436"><animate attributeName="transform" values="rotate(0,132,142);rotate(15,132,142);rotate(0,132,142);rotate(-15,132,142);rotate(0,132,142)" dur="0.8s" repeatCount="indefinite" id="sbLegRAnim"/></rect>';
+    h+='<circle cx="155" cy="185" r="12" fill="#fff" stroke="#2D3436" stroke-width="2" id="sbBall"/>';
+    h+='</svg>';
+    h+='<div id="sbOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3"></div>';
+    h+='<div class="sb-sentence" id="sbDisplay" style="background:rgba(255,255,255,.92);border-radius:14px;padding:14px 18px;margin-top:8px;max-width:95%;font-size:clamp(1rem,3vw,1.3rem);position:relative;z-index:2;box-shadow:0 4px 15px rgba(0,0,0,.1)"></div>';
+    h+='<div id="sbTenseLabel" style="margin-top:6px;font-weight:900;font-size:.8rem;color:#fff;background:rgba(0,0,0,.25);padding:4px 16px;border-radius:20px;display:inline-block;position:relative;z-index:2"></div>';
+    h+='</div>';
+    h+='<div class="ia-controls">';
+    h+='<div class="ia-ctrl-group"><span class="ia-ctrl-label">Chủ ngữ</span><div class="ia-pill"><button class="ia-pill-btn active" onclick="sbChange(\'subject\',\'I\',this)">I</button><button class="ia-pill-btn" onclick="sbChange(\'subject\',\'She\',this)">She</button><button class="ia-pill-btn" onclick="sbChange(\'subject\',\'They\',this)">They</button></div></div>';
+    h+='<div class="ia-ctrl-group"><span class="ia-ctrl-label">Thì</span><div class="ia-pill"><button class="ia-pill-btn active" onclick="sbChange(\'tense\',\'present\',this)">Present</button><button class="ia-pill-btn" onclick="sbChange(\'tense\',\'past\',this)">Past</button><button class="ia-pill-btn" onclick="sbChange(\'tense\',\'future\',this)">Future</button></div></div>';
+    h+='<div class="ia-ctrl-group"><span class="ia-ctrl-label">Dạng</span><div class="ia-pill"><button class="ia-pill-btn active" onclick="sbChange(\'form\',\'pos\',this)">✅ Khẳng định</button><button class="ia-pill-btn" onclick="sbChange(\'form\',\'neg\',this)">🚫 Phủ định</button><button class="ia-pill-btn" onclick="sbChange(\'form\',\'q\',this)">❓ Câu hỏi</button></div></div>';
+    h+='</div>';
+    h+='<div style="text-align:center;margin-top:8px"><button class="speak-btn" onclick="sbSpeak()">🔊 Nghe</button></div>';
+    return h;
+}
+function sbSpeak(){const el=document.getElementById('sbDisplay');if(el)speak(el.textContent,null)}
+function sbChange(key,val,btn){
+    window._sbState[key]=val;
+    btn.parentElement.querySelectorAll('.ia-pill-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');sbRender();
+}
+function sbRender(){
+    const s=window._sbState,d=window._sbData;if(!d)return;
+    const el=document.getElementById('sbDisplay');if(!el)return;
+    const verbPart=d[s.tense][s.form][s.subject];
+    const obj=' football every day'+(s.form==='q'?'?':'.');
+    el.innerHTML='<span class="sb-highlight">'+verbPart+'</span>'+obj;
+    // Tense label
+    const labels={present:'🟢 Present Simple — Thói quen',past:'🟡 Past Simple — Đã xảy ra',future:'🔵 Future Simple — Sẽ xảy ra'};
+    const tl=document.getElementById('sbTenseLabel');if(tl)tl.textContent=labels[s.tense];
+    // Animate legs
+    const legLA=document.getElementById('sbLegLAnim'),legRA=document.getElementById('sbLegRAnim');
+    if(s.tense==='present'){
+        if(legLA)legLA.setAttribute('repeatCount','indefinite');
+        if(legRA)legRA.setAttribute('repeatCount','indefinite');
+    }else{
+        if(legLA)legLA.setAttribute('repeatCount','0');
+        if(legRA)legRA.setAttribute('repeatCount','0');
+    }
+    // Mouth
+    const mouth=document.getElementById('sbMouth');
+    if(mouth){
+        if(s.form==='pos')mouth.setAttribute('d','M105 60 Q120 73 135 60');
+        else if(s.form==='neg')mouth.setAttribute('d','M105 65 Q120 55 135 65');
+        else mouth.setAttribute('d','M108 63 Q120 63 132 63');
+    }
+    // Overlay effects
+    const ov=document.getElementById('sbOverlay');
+    if(ov){
+        ov.innerHTML='';
+        if(s.tense==='past'){
+            ov.innerHTML='<div class="sb-flash" style="top:15px;right:15px;color:#F9CA24;font-size:1.1rem">📅 YESTERDAY</div>';
+        }else if(s.tense==='future'){
+            ov.innerHTML='<div class="sb-flash" style="top:15px;right:15px;color:#74b9ff;font-size:1.1rem">🔮 TOMORROW →</div>';
+        }
+        if(s.form==='neg'){
+            ov.innerHTML+='<div class="sb-ban" style="top:50%;left:50%;transform:translate(-50%,-50%)">🚫</div>';
+        }else if(s.form==='q'){
+            ov.innerHTML+='<div class="sb-question" style="top:5px;left:50%;transform:translateX(-50%)">❓</div>';
+        }
+    }
+}
+
+// --- Dress-up with Catwalk ---
+function renderDressUp(){
+    const items=[
+        {id:'hat',name:'Baseball cap',emoji:'🧢',color:'#e17055'},
+        {id:'top',name:'Leather jacket',emoji:'🧥',color:'#2d3436'},
+        {id:'scarf',name:'Silk scarf',emoji:'🧣',color:'#fd79a8'},
+        {id:'bag',name:'Handbag',emoji:'👜',color:'#6c5ce7'},
+        {id:'bottom',name:'Baggy jeans',emoji:'👖',color:'#0984e3'},
+        {id:'shoes',name:'Sneakers',emoji:'👟',color:'#00b894'}
+    ];
+    window._duEquipped={};window._duItems=items;window._duShowMode=false;
+    let h='<h3 style="font-weight:900;font-size:1.15rem;margin-bottom:6px;text-align:center">👗 Phòng Thay Đồ & Catwalk</h3>';
+    h+='<p style="text-align:center;font-size:.82rem;color:var(--text-light);font-weight:600;margin-bottom:12px">Mặc đồ → Bấm Trình diễn → Xem fashion show!</p>';
+    h+='<div class="ia-scene" style="background:linear-gradient(180deg,#ffeaa7,#fdcb6e 40%,#fab1a0 80%,#e17055);min-height:280px;display:flex;align-items:center;justify-content:center;position:relative" id="duMainStage">';
+    h+='<svg viewBox="0 0 200 300" width="120" id="duSvg">';
+    h+='<circle cx="100" cy="45" r="32" fill="#FDCB6E" stroke="#F9CA24" stroke-width="2"/>';
+    h+='<circle cx="88" cy="38" r="4" fill="#2D3436"/><circle cx="112" cy="38" r="4" fill="#2D3436"/>';
+    h+='<path id="duMouth" d="M90 58 Q100 55 110 58" fill="none" stroke="#2D3436" stroke-width="2.5" stroke-linecap="round"/>';
+    h+='<path d="M70 50 Q68 30 82 22" fill="none" stroke="#2D3436" stroke-width="3.5"/>';
+    h+='<path d="M130 50 Q132 30 118 22" fill="none" stroke="#2D3436" stroke-width="3.5"/>';
+    h+='<rect x="72" y="82" width="56" height="68" rx="10" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1.5" id="duBodyBase"/>';
+    h+='<line x1="72" y1="92" x2="42" y2="132" stroke="#FDCB6E" stroke-width="10" stroke-linecap="round"/>';
+    h+='<line x1="128" y1="92" x2="158" y2="132" stroke="#FDCB6E" stroke-width="10" stroke-linecap="round"/>';
+    h+='<rect x="78" y="150" width="18" height="60" rx="8" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1.5"/>';
+    h+='<rect x="104" y="150" width="18" height="60" rx="8" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1.5"/>';
+    h+='<ellipse cx="87" cy="215" rx="15" ry="8" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1.5"/>';
+    h+='<ellipse cx="113" cy="215" rx="15" ry="8" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1.5"/>';
+    h+='<g id="duLayer_hat" style="display:none"><ellipse cx="100" cy="18" rx="30" ry="10" fill="#e17055"/><rect x="76" y="5" width="48" height="16" rx="6" fill="#e17055"/></g>';
+    h+='<g id="duLayer_top" style="display:none"><rect x="72" y="82" width="56" height="68" rx="10" fill="#2d3436"/><text x="100" y="122" text-anchor="middle" fill="#fff" font-size="18">🧥</text></g>';
+    h+='<g id="duLayer_scarf" style="display:none"><path d="M78 76 Q100 88 122 76 L118 96 Q100 90 82 96 Z" fill="#fd79a8" opacity=".85"/></g>';
+    h+='<g id="duLayer_bag" style="display:none"><rect x="142" y="105" width="22" height="28" rx="5" fill="#6c5ce7"/><path d="M148 105 Q153 95 158 105" fill="none" stroke="#6c5ce7" stroke-width="3"/></g>';
+    h+='<g id="duLayer_bottom" style="display:none"><rect x="78" y="150" width="18" height="60" rx="8" fill="#0984e3"/><rect x="104" y="150" width="18" height="60" rx="8" fill="#0984e3"/></g>';
+    h+='<g id="duLayer_shoes" style="display:none"><ellipse cx="87" cy="215" rx="15" ry="8" fill="#00b894"/><ellipse cx="113" cy="215" rx="15" ry="8" fill="#00b894"/></g>';
+    h+='<g id="duHearts" style="display:none"><text x="148" y="35" font-size="16">❤️</text><text x="42" y="45" font-size="12">💕</text><text x="155" y="70" font-size="10">✨</text></g>';
+    h+='</svg>';
+    h+='</div>';
+    h+='<div class="du-desc" id="duDesc" style="background:linear-gradient(135deg,#EDE7F6,#D1C4E9);padding:12px 16px;border-radius:var(--radius-sm);margin:10px 0;min-height:44px;text-align:center"><span style="color:var(--text-light)">Bấm chọn trang phục bên dưới...</span></div>';
+    h+='<div class="du-wardrobe">';
+    items.forEach(function(it){
+        h+='<div class="du-item-btn" onclick="duToggle(\''+it.id+'\',this)" data-id="'+it.id+'"><span style="font-size:1.5rem">'+it.emoji+'</span><br><span style="font-size:.78rem">'+it.name+'</span></div>';
+    });
+    h+='</div>';
+    h+='<div style="display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap">';
+    h+='<button class="quiz-btn secondary" onclick="duReset()">🔄 Reset</button>';
+    h+='<button class="quiz-btn primary" id="duShowBtn" onclick="duCatwalk()" style="display:none">🌟 Trình diễn!</button>';
+    h+='<button class="speak-btn" onclick="speak(document.getElementById(\'duDesc\').textContent,this)">🔊</button>';
+    h+='</div>';
+    return h;
+}
+function duToggle(id,btn){
+    var layer=document.getElementById('duLayer_'+id);if(!layer)return;
+    if(window._duEquipped[id]){delete window._duEquipped[id];btn.classList.remove('equipped');layer.style.display='none'}
+    else{window._duEquipped[id]=window._duItems.find(function(i){return i.id===id});btn.classList.add('equipped');layer.style.display='block';layer.style.animation='duEquip .5s cubic-bezier(.175,.885,.32,1.275)';playCorrectSound()}
+    duUpdateDesc();
+    var hearts=document.getElementById('duHearts'),n=Object.keys(window._duEquipped).length;
+    if(hearts)hearts.style.display=n>=3?'block':'none';
+    var mouth=document.getElementById('duMouth');
+    if(mouth){if(n>=3)mouth.setAttribute('d','M85 52 Q100 70 115 52');else if(n>=1)mouth.setAttribute('d','M88 56 Q100 66 112 56');else mouth.setAttribute('d','M90 58 Q100 55 110 58')}
+    var showBtn=document.getElementById('duShowBtn');if(showBtn)showBtn.style.display=n>=3?'inline-block':'none';
+}
+function duUpdateDesc(){
+    var eq=Object.values(window._duEquipped),desc=document.getElementById('duDesc');
+    if(eq.length===0){desc.innerHTML='<span style="color:var(--text-light)">Bấm chọn trang phục bên dưới...</span>';return}
+    var names=eq.map(function(i){return i.name.toLowerCase()});
+    var sentence='He is wearing ';
+    if(names.length===1)sentence+='a '+names[0]+'.';
+    else if(names.length===2)sentence+='a '+names[0]+' and '+names[1]+'.';
+    else sentence+=names.slice(0,-1).map(function(n){return 'a '+n}).join(', ')+' and '+names[names.length-1]+'.';
+    desc.innerHTML='<b style="color:var(--primary)">'+sentence+'</b>';
+}
+function duReset(){
+    window._duEquipped={};
+    document.querySelectorAll('.du-item-btn').forEach(function(b){b.classList.remove('equipped')});
+    ['hat','top','scarf','bag','bottom','shoes'].forEach(function(id){var l=document.getElementById('duLayer_'+id);if(l)l.style.display='none'});
+    var hearts=document.getElementById('duHearts');if(hearts)hearts.style.display='none';
+    var mouth=document.getElementById('duMouth');if(mouth)mouth.setAttribute('d','M90 58 Q100 55 110 58');
+    document.getElementById('duDesc').innerHTML='<span style="color:var(--text-light)">Bấm chọn trang phục bên dưới...</span>';
+    var showBtn=document.getElementById('duShowBtn');if(showBtn)showBtn.style.display='none';
+    var stage=document.getElementById('duMainStage');if(stage&&stage._catwalking){stage.innerHTML='';window.location.reload()}
+}
+function duCatwalk(){
+    var stage=document.getElementById('duMainStage');if(!stage)return;
+    stage._catwalking=true;
+    var svgStr=document.getElementById('duSvg').outerHTML;
+    stage.innerHTML='<div class="du-catwalk-stage" style="width:100%;height:100%;position:relative">'
+        +'<div class="du-catwalk-floor"></div>'
+        +'<div class="du-catwalk-lights"></div>'
+        +'<div class="du-catwalk-char" style="width:80px">'+svgStr+'</div>'
+        +'<div class="du-flash-overlay"></div>'
+        +'<div class="du-applause">👏👏👏👏👏</div>'
+        +'</div>';
+    playCorrectSound();
+    setTimeout(function(){spawnEmojiRain(['✨','⭐','💫','👗','💕'],20)},2500);
+    setTimeout(function(){spawnConfetti()},3000);
+    var desc=document.getElementById('duDesc');
+    if(desc)desc.innerHTML='<b style="color:var(--secondary)">🌟 Fashion Show! '+desc.textContent+'</b>';
+}
+
+// --- Emotion Meter: "Lab" ---
+function renderEmotionMeter(){
+    var groups=[
+        {label:'😊 Vui',color:'#00b894',words:[{word:'happy',level:25,meaning:'Vui vẻ'},{word:'excited',level:50,meaning:'Hào hứng'},{word:'thrilled',level:75,meaning:'Phấn khích'},{word:'ecstatic',level:95,meaning:'Cực kỳ sung sướng'}]},
+        {label:'😢 Buồn',color:'#0984e3',words:[{word:'sad',level:25,meaning:'Buồn'},{word:'tired',level:50,meaning:'Mệt'},{word:'exhausted',level:75,meaning:'Kiệt sức'},{word:'devastated',level:95,meaning:'Suy sụp'}]},
+        {label:'😨 Sợ',color:'#a29bfe',words:[{word:'nervous',level:25,meaning:'Lo lắng'},{word:'scared',level:50,meaning:'Sợ'},{word:'frightened',level:75,meaning:'Hoảng sợ'},{word:'terrified',level:95,meaning:'Khiếp sợ'}]},
+        {label:'😡 Giận',color:'#e17055',words:[{word:'annoyed',level:25,meaning:'Bực mình'},{word:'angry',level:55,meaning:'Tức giận'},{word:'furious',level:80,meaning:'Giận dữ'},{word:'livid',level:95,meaning:'Giận sôi máu'}]}
+    ];
+    window._emGroups=groups;window._emActiveGroup=0;
+    var h='<h3 style="font-weight:900;font-size:1.15rem;margin-bottom:6px;text-align:center">🧪 Phòng Thí Nghiệm Cảm Xúc</h3>';
+    h+='<p style="text-align:center;font-size:.82rem;color:var(--text-light);font-weight:600;margin-bottom:12px">Chọn nhóm → bấm từ → xem bình thí nghiệm phản ứng!</p>';
+    h+='<div class="ia-scene" style="background:linear-gradient(180deg,#2d3436,#636e72);padding:20px 15px;min-height:300px;position:relative;overflow:hidden" id="emLabScene">';
+    // Flask SVG
+    h+='<svg viewBox="0 0 200 280" width="140" style="display:block;margin:0 auto;position:relative;z-index:2" id="emFlask">';
+    // Flask body
+    h+='<path d="M70 100 L70 60 Q70 50 80 50 L120 50 Q130 50 130 60 L130 100 L160 220 Q165 240 150 250 L50 250 Q35 240 40 220 Z" fill="rgba(200,220,240,.15)" stroke="rgba(255,255,255,.4)" stroke-width="2"/>';
+    // Liquid
+    h+='<clipPath id="flaskClip"><path d="M70 100 L70 60 Q70 50 80 50 L120 50 Q130 50 130 60 L130 100 L160 220 Q165 240 150 250 L50 250 Q35 240 40 220 Z"/></clipPath>';
+    h+='<rect id="emLiquid" x="30" y="250" width="140" height="0" fill="#00b894" clip-path="url(#flaskClip)" style="transition:all .8s cubic-bezier(.68,-.55,.27,1.55)"><animate attributeName="y" values="250;248;250" dur="2s" repeatCount="indefinite"/></rect>';
+    // Face on liquid surface
+    h+='<g id="emFaceG" style="transition:all .6s" transform="translate(100,200)">';
+    h+='<circle cx="0" cy="0" r="22" fill="#FDCB6E"/>';
+    h+='<circle cx="-7" cy="-5" r="3" fill="#2D3436"/><circle cx="7" cy="-5" r="3" fill="#2D3436"/>';
+    h+='<path id="emLabMouth" d="M-8 5 Q0 12 8 5" fill="none" stroke="#2D3436" stroke-width="2" stroke-linecap="round"/>';
+    h+='</g>';
+    // Bubbles container
+    h+='<g id="emBubbles"></g>';
+    // Steam
+    h+='<g id="emSteam" style="display:none">';
+    h+='<ellipse cx="85" cy="48" rx="8" ry="4" fill="rgba(255,255,255,.3)"><animate attributeName="cy" values="48;30" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" values=".4;0" dur="1.5s" repeatCount="indefinite"/></ellipse>';
+    h+='<ellipse cx="115" cy="45" rx="6" ry="3" fill="rgba(255,255,255,.3)"><animate attributeName="cy" values="45;25" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".3;0" dur="1.8s" repeatCount="indefinite"/></ellipse>';
+    h+='</g>';
+    h+='</svg>';
+    h+='<div class="em-word-display" id="emWordDisplay" style="font-size:1.15rem;margin:8px 0;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.3)">Chọn một từ...</div>';
+    h+='</div>';
+    // Group tabs
+    h+='<div style="display:flex;gap:6px;justify-content:center;margin:12px 0;flex-wrap:wrap">';
+    groups.forEach(function(g,i){
+        h+='<button class="collection-tab-btn '+(i===0?'active':'')+'" onclick="emSwitchGroup('+i+',this)" style="border-color:'+g.color+';'+(i===0?'background:'+g.color+';color:#fff':'color:'+g.color)+'">'+g.label+'</button>';
+    });
+    h+='</div>';
+    h+='<div class="em-word-btns" id="emBtns"></div>';
+    return h;
+}
+function emSwitchGroup(idx,btn){
+    window._emActiveGroup=idx;
+    var g=window._emGroups[idx];
+    document.querySelectorAll('.collection-tab-btn').forEach(function(b,i){
+        var gr=window._emGroups[i];
+        b.classList.remove('active');b.style.background='#fff';b.style.color=gr.color;
+    });
+    if(btn){btn.classList.add('active');btn.style.background=g.color;btn.style.color='#fff'}
+    var el=document.getElementById('emBtns');
+    el.innerHTML=g.words.map(function(w,i){
+        return '<div class="em-word-btn" onclick="emSelect2('+idx+','+i+',this)" style="border-color:'+g.color+'"><button class="speak-btn small" onclick="event.stopPropagation();speak(\''+w.word+'\',this)" style="margin-right:6px">🔊</button><b>'+w.word+'</b><br><span style="font-size:.75rem;color:var(--text-light)">'+w.meaning+'</span></div>';
+    }).join('');
+}
+function emSelect2(gIdx,wIdx,btn){
+    var g=window._emGroups[gIdx],w=g.words[wIdx];
+    document.querySelectorAll('.em-word-btn').forEach(function(b){b.classList.remove('em-selected')});
+    btn.classList.add('em-selected');
+    // Liquid level & color
+    var liquid=document.getElementById('emLiquid');
+    if(liquid){
+        var h=w.level*2;
+        liquid.setAttribute('y',250-h);liquid.setAttribute('height',h);
+        liquid.setAttribute('fill',g.color);
+    }
+    // Face position
+    var faceG=document.getElementById('emFaceG');
+    if(faceG)faceG.setAttribute('transform','translate(100,'+(248-w.level*1.8)+')');
+    // Face expression
+    var mouth=document.getElementById('emLabMouth');
+    if(mouth){
+        if(gIdx===0)mouth.setAttribute('d','M-8 '+(5-w.level*0.03)+' Q0 '+(12+w.level*0.08)+' 8 '+(5-w.level*0.03));
+        else if(gIdx===1)mouth.setAttribute('d','M-8 '+(8+w.level*0.03)+' Q0 '+(3-w.level*0.04)+' 8 '+(8+w.level*0.03));
+        else if(gIdx===2)mouth.setAttribute('d','M-5 '+(7-w.level*0.01)+' Q0 '+(7+w.level*0.02)+' 5 '+(7-w.level*0.01));
+        else mouth.setAttribute('d','M-8 '+(7-w.level*0.02)+' Q0 '+(4-w.level*0.02)+' 8 '+(7-w.level*0.02));
+    }
+    // Bubbles
+    var bubbles=document.getElementById('emBubbles');
+    if(bubbles){
+        bubbles.innerHTML='';
+        var count=Math.floor(w.level/15)+1;
+        for(var i=0;i<count;i++){
+            var bx=70+Math.random()*60,by=240-w.level*1.5-Math.random()*30,br=2+Math.random()*4;
+            bubbles.innerHTML+='<circle cx="'+bx+'" cy="'+by+'" r="'+br+'" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1"><animate attributeName="cy" values="'+by+';'+(by-60)+'" dur="'+(1.5+Math.random())+'s" repeatCount="indefinite"/><animate attributeName="opacity" values=".5;0" dur="'+(1.5+Math.random())+'s" repeatCount="indefinite"/></circle>';
+        }
+    }
+    // Steam for extreme levels
+    var steam=document.getElementById('emSteam');
+    if(steam)steam.style.display=w.level>=80?'block':'none';
+    // Shake flask for 90+
+    var flask=document.getElementById('emFlask');
+    if(flask){
+        if(w.level>=90){flask.style.animation='labShake .3s ease infinite'}
+        else{flask.style.animation='none'}
+    }
+    // Display
+    document.getElementById('emWordDisplay').innerHTML='<b style="font-size:1.4rem">'+w.word+'</b> <span style="font-size:.9rem;opacity:.8">'+w.meaning+'</span> — <b>'+w.level+'%</b>';
+    speak(w.word,null);
+}
+
+
+
+// --- Journey Map (Unit 3) ---
+function renderJourneyMap(){
+    var stops=[
+        {place:'Home',emoji:'🏠',sentence:'I have packed my bags.',vi:'Tôi đã xếp hành lý.'},
+        {place:'Mountain',emoji:'⛰️',sentence:'I have climbed a mountain.',vi:'Tôi đã leo núi.'},
+        {place:'River',emoji:'🏞️',sentence:'I have crossed a river.',vi:'Tôi đã băng qua sông.'},
+        {place:'Beach',emoji:'🏖️',sentence:'I have swum in the ocean.',vi:'Tôi đã bơi ở biển.'},
+        {place:'Forest',emoji:'🌲',sentence:'I have explored a forest.',vi:'Tôi đã khám phá rừng.'},
+        {place:'Camp',emoji:'🏕️',sentence:'I have set up a campfire.',vi:'Tôi đã dựng lửa trại.'}
+    ];
+    window._jmStops=stops;window._jmIdx=0;
+    var h='<h3 style="font-weight:900;font-size:1.15rem;margin-bottom:6px;text-align:center">🗺️ Bản Đồ Hành Trình</h3>';
+    h+='<p style="text-align:center;font-size:.82rem;color:var(--text-light);font-weight:600;margin-bottom:12px">Bấm "Đi tiếp!" để khám phá + học Present Perfect!</p>';
+    h+='<div class="ia-scene" style="background:linear-gradient(180deg,#74b9ff 0%,#a29bfe 20%,#55efc4 70%,#00b894);min-height:220px;position:relative;overflow:hidden;padding:15px">';
+    // Path dots
+    h+='<svg viewBox="0 0 500 60" width="100%" height="50" style="position:absolute;bottom:40px;left:0" id="jmPath">';
+    h+='<line x1="30" y1="30" x2="470" y2="30" stroke="rgba(255,255,255,.3)" stroke-width="3" stroke-dasharray="8,6"/>';
+    stops.forEach(function(s,i){
+        var x=30+i*(440/(stops.length-1));
+        h+='<circle cx="'+x+'" cy="30" r="12" fill="'+(i===0?'#FDCB6E':'rgba(255,255,255,.3)')+'" stroke="#fff" stroke-width="2" id="jmDot'+i+'"/>';
+        h+='<text x="'+x+'" cy="30" y="55" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">'+s.place+'</text>';
+    });
+    // Character
+    h+='<text id="jmChar" x="30" y="22" font-size="22" text-anchor="middle" style="transition:all .8s cubic-bezier(.68,-.55,.27,1.55)">🧑‍🎒</text>';
+    h+='</svg>';
+    // Display area
+    h+='<div style="text-align:center;position:relative;z-index:2">';
+    h+='<div id="jmEmoji" style="font-size:3.5rem;margin-bottom:5px;transition:all .5s">🏠</div>';
+    h+='<div id="jmSentence" style="background:rgba(255,255,255,.9);border-radius:12px;padding:12px 18px;font-weight:800;font-size:clamp(.95rem,2.8vw,1.2rem);color:var(--primary);display:inline-block;box-shadow:0 4px 15px rgba(0,0,0,.1)"></div>';
+    h+='<div id="jmVi" class="sent-vi" style="margin-top:6px;font-weight:600;font-size:.85rem;color:rgba(255,255,255,.8)"></div>';
+    h+='</div>';
+    h+='</div>';
+    h+='<div style="display:flex;gap:10px;justify-content:center;margin-top:12px">';
+    h+='<button class="quiz-btn primary" onclick="jmNext()" id="jmNextBtn">🚶 Đi tiếp!</button>';
+    h+='<button class="speak-btn" onclick="jmSpeak()">🔊</button>';
+    h+='</div>';
+    h+='<div id="jmProgress" style="text-align:center;margin-top:8px;font-weight:800;font-size:.85rem;color:var(--text-light)"></div>';
+    return h;
+}
+function jmGo(idx){
+    var stops=window._jmStops;if(idx>=stops.length)return;
+    window._jmIdx=idx;var s=stops[idx];
+    document.getElementById('jmEmoji').textContent=s.emoji;
+    document.getElementById('jmEmoji').style.transform='scale(1.2)';
+    setTimeout(function(){document.getElementById('jmEmoji').style.transform='scale(1)'},300);
+    document.getElementById('jmSentence').innerHTML='<span class="sb-highlight">'+s.sentence+'</span>';
+    document.getElementById('jmVi').textContent=s.vi;
+    document.getElementById('jmProgress').textContent=(idx+1)+'/'+stops.length+' điểm dừng';
+    // Move character
+    var char=document.getElementById('jmChar');
+    if(char){var x=30+idx*(440/(stops.length-1));char.setAttribute('x',x)}
+    // Light up dots
+    for(var i=0;i<=idx;i++){var dot=document.getElementById('jmDot'+i);if(dot)dot.setAttribute('fill','#FDCB6E')}
+    if(idx>=stops.length-1){
+        document.getElementById('jmNextBtn').textContent='🏆 Hoàn thành!';
+        document.getElementById('jmNextBtn').disabled=true;
+        spawnConfetti();spawnEmojiRain(['🏆','⛰️','🏖️','🌲','🏕️'],20);
+        addXP(30,'Journey Map');
+    }
+    speak(s.sentence,null);
+}
+function jmNext(){var idx=window._jmIdx+1;if(idx<window._jmStops.length)jmGo(idx)}
+function jmSpeak(){var s=window._jmStops[window._jmIdx];if(s)speak(s.sentence,null)}
+
+// --- Factory Line (Unit 4) ---
+function renderFactoryLine(){
+    var products=[
+        {material:'Cotton',matEmoji:'🧶',product:'T-shirt',prodEmoji:'👕',sentence:'This T-shirt is made of cotton.'},
+        {material:'Leather',matEmoji:'🧥',product:'Bag',prodEmoji:'👜',sentence:'This bag is made of leather.'},
+        {material:'Silk',matEmoji:'🎀',product:'Scarf',prodEmoji:'🧣',sentence:'This scarf is made of silk.'},
+        {material:'Plastic',matEmoji:'♻️',product:'Bottle',prodEmoji:'🍶',sentence:'This bottle is made of plastic.'},
+        {material:'Wood',matEmoji:'🪵',product:'Table',prodEmoji:'🪑',sentence:'This table is made of wood.'},
+        {material:'Glass',matEmoji:'🔮',product:'Window',prodEmoji:'🪟',sentence:'This window is made of glass.'}
+    ];
+    window._flProducts=products;window._flRunning=false;
+    var h='<h3 style="font-weight:900;font-size:1.15rem;margin-bottom:6px;text-align:center">🏭 Nhà Máy Sản Xuất</h3>';
+    h+='<p style="text-align:center;font-size:.82rem;color:var(--text-light);font-weight:600;margin-bottom:12px">Chọn nguyên liệu → Xem băng chuyền chạy → Học Passive Voice!</p>';
+    h+='<div class="ia-scene" style="background:linear-gradient(180deg,#636e72,#2d3436);min-height:200px;position:relative;overflow:hidden;padding:15px">';
+    // Conveyor belt
+    h+='<div style="position:absolute;bottom:30px;left:0;width:100%;height:8px;background:repeating-linear-gradient(90deg,#555,#555 20px,#777 20px,#777 40px);animation:conveyorMove 2s linear infinite" id="flBelt"></div>';
+    // Items on belt
+    h+='<div id="flMaterial" style="position:absolute;bottom:40px;left:-60px;font-size:2.5rem;transition:left 1.5s ease-in-out"></div>';
+    h+='<div id="flMachine" style="position:absolute;bottom:25px;left:45%;transform:translateX(-50%);font-size:2rem;text-align:center">⚙️<br><span style="font-size:.7rem;color:#aaa;font-weight:700">MACHINE</span></div>';
+    h+='<div id="flProduct" style="position:absolute;bottom:40px;right:-60px;font-size:2.5rem;transition:right 1s ease-in-out;opacity:0"></div>';
+    // Sentence
+    h+='<div id="flSentence" style="position:absolute;top:15px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.9);border-radius:12px;padding:10px 18px;font-weight:800;font-size:clamp(.9rem,2.5vw,1.1rem);color:var(--primary);opacity:0;transition:opacity .5s;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,.2)"></div>';
+    h+='</div>';
+    // Material buttons
+    h+='<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px">';
+    products.forEach(function(p,i){
+        h+='<div class="du-item-btn" onclick="flRun('+i+')" style="min-width:80px"><span style="font-size:1.4rem">'+p.matEmoji+'</span><br><span style="font-size:.78rem">'+p.material+'</span></div>';
+    });
+    h+='</div>';
+    return h;
+}
+function flRun(idx){
+    if(window._flRunning)return;window._flRunning=true;
+    var p=window._flProducts[idx];
+    var mat=document.getElementById('flMaterial'),prod=document.getElementById('flProduct'),sent=document.getElementById('flSentence');
+    // Reset
+    mat.style.left='-60px';mat.textContent=p.matEmoji;
+    prod.style.right='-60px';prod.style.opacity='0';prod.textContent=p.prodEmoji;
+    sent.style.opacity='0';
+    // Step 1: material moves to machine
+    setTimeout(function(){mat.style.left='42%'},100);
+    // Step 2: machine processes (shake)
+    setTimeout(function(){
+        var machine=document.getElementById('flMachine');
+        machine.style.animation='labShake .2s ease 5';
+        mat.style.opacity='0';
+        playCorrectSound();
+    },1600);
+    // Step 3: product comes out
+    setTimeout(function(){
+        prod.style.opacity='1';prod.style.right='15%';
+        var machine=document.getElementById('flMachine');machine.style.animation='none';
+    },2500);
+    // Step 4: sentence appears
+    setTimeout(function(){
+        sent.innerHTML='<span class="sb-highlight">'+p.sentence+'</span>';
+        sent.style.opacity='1';
+        speak(p.sentence,null);
+        mat.style.opacity='1';mat.style.left='-60px';
+        window._flRunning=false;
+    },3200);
+}
+
+// --- Time Machine (Unit 5) ---
+function renderTimeMachine(){
+    var items=[
+        {present:'Normal car 🚗',future:'Self-driving car 🤖🚗',sentence:'People will use self-driving cars.'},
+        {present:'Classroom 🏫',future:'VR Learning 🥽📚',sentence:'Students will study using virtual reality.'},
+        {present:'Doctor visit 🏥',future:'AI Doctor 🤖💊',sentence:'AI will help doctors treat patients.'},
+        {present:'Paper money 💵',future:'Digital wallet 📱💳',sentence:'People will pay with digital wallets.'},
+        {present:'Factory workers 👷',future:'Robots 🤖🏭',sentence:'Robots will do factory work.'}
+    ];
+    window._tmItems=items;window._tmIdx=0;window._tmFuture=false;
+    var h='<h3 style="font-weight:900;font-size:1.15rem;margin-bottom:6px;text-align:center">🔮 Máy Thời Gian</h3>';
+    h+='<p style="text-align:center;font-size:.82rem;color:var(--text-light);font-weight:600;margin-bottom:12px">Bấm du hành → So sánh hiện tại vs tương lai!</p>';
+    h+='<div class="ia-scene" id="tmScene" style="min-height:240px;position:relative;overflow:hidden;transition:background 1s">';
+    // Split view
+    h+='<div style="display:flex;height:100%;min-height:200px" id="tmView">';
+    h+='<div id="tmLeft" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:15px;transition:all .8s;background:rgba(255,255,255,.1);border-right:2px dashed rgba(255,255,255,.3)">';
+    h+='<div style="font-size:.75rem;font-weight:900;color:rgba(255,255,255,.7);margin-bottom:5px">📅 NOW (2025)</div>';
+    h+='<div id="tmPresentEmoji" style="font-size:2.5rem;margin-bottom:8px;transition:all .5s"></div>';
+    h+='<div id="tmPresentText" style="color:#fff;font-weight:800;font-size:.9rem;text-align:center"></div>';
+    h+='</div>';
+    h+='<div id="tmRight" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:15px;transition:all .8s;opacity:.3">';
+    h+='<div style="font-size:.75rem;font-weight:900;color:rgba(255,255,255,.7);margin-bottom:5px">🔮 FUTURE (2050)</div>';
+    h+='<div id="tmFutureEmoji" style="font-size:2.5rem;margin-bottom:8px;transition:all .5s"></div>';
+    h+='<div id="tmFutureText" style="color:#fff;font-weight:800;font-size:.9rem;text-align:center"></div>';
+    h+='</div>';
+    h+='</div>';
+    // Vortex overlay
+    h+='<div id="tmVortex" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;opacity:0;transition:all .5s;pointer-events:none">🌀</div>';
+    // Sentence
+    h+='<div id="tmSentence" style="background:rgba(255,255,255,.9);border-radius:12px;padding:10px 18px;font-weight:800;font-size:clamp(.9rem,2.5vw,1.1rem);color:var(--primary);text-align:center;margin-top:10px;min-height:40px;box-shadow:0 4px 15px rgba(0,0,0,.1)"></div>';
+    h+='</div>';
+    h+='<div style="display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap">';
+    h+='<button class="quiz-btn primary" onclick="tmTravel()" id="tmTravelBtn">🔮 Du hành thời gian!</button>';
+    h+='<button class="quiz-btn secondary" onclick="tmNextItem()">⏭️ Chủ đề tiếp</button>';
+    h+='<button class="speak-btn" onclick="tmSpeak()">🔊</button>';
+    h+='</div>';
+    h+='<div id="tmProgress" style="text-align:center;margin-top:8px;font-weight:800;font-size:.85rem;color:var(--text-light)"></div>';
+    return h;
+}
+function tmShowItem(){
+    var item=window._tmItems[window._tmIdx];
+    var scene=document.getElementById('tmScene');
+    scene.style.background=window._tmFuture?'linear-gradient(180deg,#0c2461,#0a3d62,#6C5CE7)':'linear-gradient(180deg,#dfe6e9,#b2bec3,#636e72)';
+    document.getElementById('tmPresentEmoji').textContent=item.present.split(' ').pop();
+    document.getElementById('tmPresentText').textContent=item.present;
+    document.getElementById('tmFutureEmoji').textContent=item.future.split(' ').pop();
+    document.getElementById('tmFutureText').textContent=item.future;
+    document.getElementById('tmRight').style.opacity=window._tmFuture?'1':'.3';
+    document.getElementById('tmSentence').innerHTML=window._tmFuture?'<span class="sb-highlight">'+item.sentence+'</span>':'Bấm "Du hành" để xem tương lai!';
+    document.getElementById('tmProgress').textContent=(window._tmIdx+1)+'/'+window._tmItems.length;
+    if(window._tmFuture)speak(item.sentence,null);
+}
+function tmTravel(){
+    if(window._tmFuture)return;
+    window._tmFuture=true;
+    var vortex=document.getElementById('tmVortex');
+    vortex.style.opacity='1';vortex.style.transform='translate(-50%,-50%) scale(2) rotate(360deg)';
+    playCorrectSound();
+    setTimeout(function(){
+        vortex.style.opacity='0';vortex.style.transform='translate(-50%,-50%) scale(1) rotate(0)';
+        tmShowItem();
+        spawnEmojiRain(['🔮','✨','🚀','💫'],12);
+    },800);
+}
+function tmNextItem(){
+    window._tmIdx=(window._tmIdx+1)%window._tmItems.length;
+    window._tmFuture=false;
+    tmShowItem();
+    document.getElementById('tmTravelBtn').disabled=false;
+}
+function tmSpeak(){
+    var item=window._tmItems[window._tmIdx];
+    if(window._tmFuture)speak(item.sentence,null);
+}
+
+
+
+// --- Timetable (Unit 6) ---
+function renderTimetable(){
+    var subjects=[
+        {name:'Math',emoji:'🔢',must:'You must do homework every day.',should:'You should practice more exercises.'},
+        {name:'English',emoji:'🔤',must:'You must bring your textbook.',should:'You should read English stories.'},
+        {name:'Science',emoji:'🔬',must:'You must wear safety goggles in the lab.',should:'You should review the experiment notes.'},
+        {name:'PE',emoji:'⚽',must:'You must wear sports uniform.',should:'You should warm up before exercising.'},
+        {name:'Music',emoji:'🎵',must:'You must not use your phone.',should:'You should practice singing at home.'},
+        {name:'Art',emoji:'🎨',must:'You must clean up after class.',should:'You should bring your own colors.'}
+    ];
+    window._ttSubjects=subjects;window._ttMode='must';
+    var h='<h3 style="font-weight:900;font-size:1.15rem;margin-bottom:6px;text-align:center">📋 Thời Khóa Biểu Tương Tác</h3>';
+    h+='<p style="text-align:center;font-size:.82rem;color:var(--text-light);font-weight:600;margin-bottom:12px">Bấm môn học → Xem quy tắc (must) hoặc lời khuyên (should)!</p>';
+    h+='<div class="ia-controls" style="margin-bottom:12px"><div class="ia-ctrl-group"><span class="ia-ctrl-label">Chế độ</span><div class="ia-pill">';
+    h+='<button class="ia-pill-btn active" onclick="ttMode(\'must\',this)">⚠️ Must (Bắt buộc)</button>';
+    h+='<button class="ia-pill-btn" onclick="ttMode(\'should\',this)">💡 Should (Lời khuyên)</button>';
+    h+='</div></div></div>';
+    h+='<div class="ia-scene" style="background:linear-gradient(180deg,#dfe6e9,#f8f9fa);padding:15px;min-height:180px">';
+    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="ttGrid">';
+    subjects.forEach(function(s,i){
+        h+='<div class="du-item-btn" onclick="ttSelect('+i+',this)" style="text-align:center;padding:15px 10px"><span style="font-size:2rem;display:block;margin-bottom:4px">'+s.emoji+'</span><span style="font-size:.85rem;font-weight:800">'+s.name+'</span></div>';
+    });
+    h+='</div>';
+    h+='<div id="ttResult" style="background:rgba(255,255,255,.9);border-radius:12px;padding:14px 18px;margin-top:12px;font-weight:800;font-size:clamp(.9rem,2.5vw,1.1rem);color:var(--primary);text-align:center;min-height:50px;box-shadow:0 4px 15px rgba(0,0,0,.08);display:none"></div>';
+    h+='</div>';
+    h+='<div style="text-align:center;margin-top:10px"><button class="speak-btn" onclick="ttSpeak()">🔊 Nghe</button></div>';
+    return h;
+}
+function ttMode(mode,btn){
+    window._ttMode=mode;
+    btn.parentElement.querySelectorAll('.ia-pill-btn').forEach(function(b){b.classList.remove('active')});
+    btn.classList.add('active');
+    var res=document.getElementById('ttResult');if(res)res.style.display='none';
+}
+function ttSelect(idx,btn){
+    var s=window._ttSubjects[idx];
+    var sentence=window._ttMode==='must'?s.must:s.should;
+    var res=document.getElementById('ttResult');
+    res.style.display='block';
+    var icon=window._ttMode==='must'?'⚠️':'💡';
+    res.innerHTML=icon+' <span class="sb-highlight">'+sentence+'</span>';
+    speak(sentence,null);
+    document.querySelectorAll('#ttGrid .du-item-btn').forEach(function(b){b.style.borderColor='#e2e8f0'});
+    btn.style.borderColor=window._ttMode==='must'?'var(--danger)':'var(--success)';
+}
+function ttSpeak(){var res=document.getElementById('ttResult');if(res&&res.textContent)speak(res.textContent,null)}
+
+// --- Invention Timeline (Unit 7) ---
+function renderInventionTimeline(){
+    var inventions=[
+        {year:1876,item:'Telephone',emoji:'📞',active:'Alexander Graham Bell invented the telephone.',passive:'The telephone was invented by Alexander Graham Bell.'},
+        {year:1879,item:'Light Bulb',emoji:'💡',active:'Thomas Edison invented the light bulb.',passive:'The light bulb was invented by Thomas Edison.'},
+        {year:1903,item:'Airplane',emoji:'✈️',active:'The Wright Brothers built the first airplane.',passive:'The first airplane was built by the Wright Brothers.'},
+        {year:1969,item:'Moon Landing',emoji:'🌙',active:'Neil Armstrong walked on the Moon.',passive:'The Moon was walked on by Neil Armstrong.'},
+        {year:1989,item:'World Wide Web',emoji:'🌐',active:'Tim Berners-Lee created the World Wide Web.',passive:'The World Wide Web was created by Tim Berners-Lee.'},
+        {year:2007,item:'iPhone',emoji:'📱',active:'Steve Jobs introduced the iPhone.',passive:'The iPhone was introduced by Steve Jobs.'}
+    ];
+    window._itItems=inventions;window._itIdx=0;window._itMode='passive';
+    var h='<h3 style="font-weight:900;font-size:1.15rem;margin-bottom:6px;text-align:center">⏳ Dòng Thời Gian Phát Minh</h3>';
+    h+='<p style="text-align:center;font-size:.82rem;color:var(--text-light);font-weight:600;margin-bottom:12px">Bấm mốc thời gian → xem phát minh + chuyển Active↔Passive!</p>';
+    h+='<div class="ia-scene" style="background:linear-gradient(180deg,#2d3436,#636e72);padding:15px 10px;min-height:260px;position:relative">';
+    // Timeline bar
+    h+='<svg viewBox="0 0 500 50" width="100%" height="45" style="margin-bottom:10px">';
+    h+='<line x1="20" y1="25" x2="480" y2="25" stroke="rgba(253,203,110,.4)" stroke-width="3"/>';
+    inventions.forEach(function(inv,i){
+        var x=20+i*(460/(inventions.length-1));
+        h+='<circle cx="'+x+'" cy="25" r="10" fill="rgba(253,203,110,.3)" stroke="#FDCB6E" stroke-width="2" style="cursor:pointer" onclick="itSelect('+i+')"/>';
+        h+='<text x="'+x+'" y="12" text-anchor="middle" fill="#FDCB6E" font-size="8" font-weight="bold">'+inv.year+'</text>';
+        h+='<text x="'+x+'" y="45" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="7">'+inv.emoji+'</text>';
+    });
+    h+='<circle id="itMarker" cx="20" cy="25" r="12" fill="#FDCB6E" stroke="#fff" stroke-width="2" style="transition:all .6s cubic-bezier(.68,-.55,.27,1.55)"/>';
+    h+='</svg>';
+    // Display
+    h+='<div style="text-align:center">';
+    h+='<div id="itEmoji" style="font-size:3.5rem;margin-bottom:5px;transition:all .5s">📞</div>';
+    h+='<div id="itItem" style="color:#FDCB6E;font-weight:900;font-size:1.2rem;margin-bottom:3px"></div>';
+    h+='<div id="itYear" style="color:rgba(255,255,255,.6);font-weight:800;font-size:.9rem;margin-bottom:10px"></div>';
+    h+='<div id="itSentence" style="background:rgba(255,255,255,.9);border-radius:12px;padding:12px 18px;font-weight:800;font-size:clamp(.9rem,2.5vw,1.1rem);color:var(--primary);display:inline-block;max-width:95%;box-shadow:0 4px 15px rgba(0,0,0,.2);transition:all .3s"></div>';
+    h+='</div></div>';
+    // Controls
+    h+='<div class="ia-controls" style="margin-top:12px"><div class="ia-ctrl-group"><span class="ia-ctrl-label">Thể</span><div class="ia-pill">';
+    h+='<button class="ia-pill-btn" onclick="itToggle(\'active\',this)">🔵 Active</button>';
+    h+='<button class="ia-pill-btn active" onclick="itToggle(\'passive\',this)">🟡 Passive</button>';
+    h+='</div></div></div>';
+    h+='<div style="display:flex;gap:10px;justify-content:center;margin-top:8px">';
+    h+='<button class="quiz-btn secondary" onclick="itPrev()">⬅️</button>';
+    h+='<button class="speak-btn" onclick="itSpeak()">🔊</button>';
+    h+='<button class="quiz-btn secondary" onclick="itNext()">➡️</button>';
+    h+='</div>';
+    return h;
+}
+function itSelect(idx){
+    window._itIdx=idx;itRender();
+}
+function itToggle(mode,btn){
+    window._itMode=mode;
+    btn.parentElement.querySelectorAll('.ia-pill-btn').forEach(function(b){b.classList.remove('active')});
+    btn.classList.add('active');itRender();
+}
+function itRender(){
+    var inv=window._itItems[window._itIdx],mode=window._itMode;
+    document.getElementById('itEmoji').textContent=inv.emoji;
+    document.getElementById('itEmoji').style.transform='scale(1.2)';
+    setTimeout(function(){document.getElementById('itEmoji').style.transform='scale(1)'},300);
+    document.getElementById('itItem').textContent=inv.item;
+    document.getElementById('itYear').textContent=inv.year;
+    var sentence=mode==='active'?inv.active:inv.passive;
+    document.getElementById('itSentence').innerHTML='<span class="sb-highlight">'+sentence+'</span>';
+    // Move marker
+    var x=20+window._itIdx*(460/(window._itItems.length-1));
+    var marker=document.getElementById('itMarker');if(marker)marker.setAttribute('cx',x);
+    speak(sentence,null);
+}
+function itPrev(){if(window._itIdx>0){window._itIdx--;itRender()}}
+function itNext(){if(window._itIdx<window._itItems.length-1){window._itIdx++;itRender()}}
+function itSpeak(){var inv=window._itItems[window._itIdx];speak(window._itMode==='active'?inv.active:inv.passive,null)}
+
+// --- Cinema Board (Unit 8) ---
+function renderCinemaBoard(){
+    var movies=[
+        {title:'The Adventure',genre:'Action 🎬',emoji:'🦸',direct:'I love this movie!',speaker:'Tom',reported:'Tom said he loved that movie.'},
+        {title:'Laugh Out Loud',genre:'Comedy 😂',emoji:'🤡',direct:'This is so funny!',speaker:'Anna',reported:'Anna said it was so funny.'},
+        {title:'Dark Secrets',genre:'Thriller 😱',emoji:'🕵️',direct:'I am scared!',speaker:'Mai',reported:'Mai said she was scared.'},
+        {title:'Ocean World',genre:'Documentary 🌊',emoji:'🐬',direct:'I will watch it again.',speaker:'Minh',reported:'Minh said he would watch it again.'},
+        {title:'Love Story',genre:'Romance 💕',emoji:'💑',direct:'I have seen it three times.',speaker:'Lan',reported:'Lan said she had seen it three times.'}
+    ];
+    window._cbMovies=movies;window._cbIdx=0;window._cbShowReported=false;
+    var h='<h3 style="font-weight:900;font-size:1.15rem;margin-bottom:6px;text-align:center">🎬 Rạp Chiếu Phim</h3>';
+    h+='<p style="text-align:center;font-size:.82rem;color:var(--text-light);font-weight:600;margin-bottom:12px">Chọn phim → Xem lời nói → Bấm Report để chuyển sang Reported Speech!</p>';
+    h+='<div class="ia-scene" style="background:linear-gradient(180deg,#1a1a2e,#16213e,#0f3460);padding:15px;min-height:260px;position:relative">';
+    // Movie posters
+    h+='<div style="display:flex;gap:8px;justify-content:center;margin-bottom:15px;flex-wrap:wrap" id="cbPosters">';
+    movies.forEach(function(m,i){
+        h+='<div onclick="cbSelect('+i+',this)" style="cursor:pointer;text-align:center;padding:8px;border-radius:10px;border:2px solid rgba(255,255,255,.2);transition:all .3s;min-width:55px" class="cb-poster"><span style="font-size:1.8rem;display:block">'+m.emoji+'</span><span style="font-size:.6rem;color:rgba(255,255,255,.6);font-weight:700">'+m.title+'</span></div>';
+    });
+    h+='</div>';
+    // Screen
+    h+='<div style="background:rgba(0,0,0,.5);border-radius:12px;padding:15px;border:2px solid rgba(253,203,110,.3);text-align:center">';
+    h+='<div id="cbGenre" style="font-size:.8rem;color:#FDCB6E;font-weight:800;margin-bottom:8px"></div>';
+    h+='<div id="cbEmoji" style="font-size:3rem;margin-bottom:8px">🎬</div>';
+    // Speech bubble
+    h+='<div id="cbBubble" style="background:#fff;border-radius:16px;padding:12px 18px;display:inline-block;position:relative;max-width:90%;box-shadow:0 4px 15px rgba(0,0,0,.2);transition:all .5s">';
+    h+='<div id="cbSpeaker" style="font-weight:900;font-size:.8rem;color:var(--secondary);margin-bottom:4px"></div>';
+    h+='<div id="cbSpeech" style="font-weight:800;font-size:clamp(.95rem,2.5vw,1.15rem);color:var(--text-dark)"></div>';
+    h+='</div>';
+    h+='<div id="cbArrow" style="color:var(--accent);font-size:1.5rem;margin-top:8px;opacity:0;transition:all .5s">⬇️ lùi thì ⬇️</div>';
+    h+='<div id="cbReported" style="background:linear-gradient(135deg,#FDCB6E,#F9CA24);border-radius:12px;padding:12px 18px;display:inline-block;margin-top:8px;font-weight:800;font-size:clamp(.9rem,2.5vw,1.1rem);color:#7D6608;opacity:0;transition:all .5s;box-shadow:0 4px 15px rgba(253,203,110,.3)"></div>';
+    h+='</div></div>';
+    // Controls
+    h+='<div style="display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap">';
+    h+='<button class="quiz-btn primary" onclick="cbReport()" id="cbReportBtn">📢 Report!</button>';
+    h+='<button class="quiz-btn secondary" onclick="cbReset()">🔄 Reset</button>';
+    h+='<button class="speak-btn" onclick="cbSpeak()">🔊</button>';
+    h+='</div>';
+    return h;
+}
+function cbSelect(idx,btn){
+    window._cbIdx=idx;window._cbShowReported=false;
+    var m=window._cbMovies[idx];
+    document.getElementById('cbGenre').textContent=m.genre;
+    document.getElementById('cbEmoji').textContent=m.emoji;
+    document.getElementById('cbSpeaker').textContent=m.speaker+' says:';
+    document.getElementById('cbSpeech').innerHTML='"'+m.direct+'"';
+    document.getElementById('cbArrow').style.opacity='0';
+    document.getElementById('cbReported').style.opacity='0';
+    document.getElementById('cbReportBtn').disabled=false;
+    // Highlight poster
+    document.querySelectorAll('.cb-poster').forEach(function(p){p.style.borderColor='rgba(255,255,255,.2)'});
+    if(btn)btn.style.borderColor='#FDCB6E';
+    speak(m.direct,null);
+}
+function cbReport(){
+    if(window._cbShowReported)return;
+    window._cbShowReported=true;
+    var m=window._cbMovies[window._cbIdx];
+    document.getElementById('cbSpeaker').textContent=m.speaker+' said:';
+    document.getElementById('cbBubble').style.opacity='.5';
+    document.getElementById('cbArrow').style.opacity='1';
+    setTimeout(function(){
+        document.getElementById('cbReported').style.opacity='1';
+        document.getElementById('cbReported').innerHTML='<span class="sb-highlight">'+m.reported+'</span>';
+        playCorrectSound();
+        speak(m.reported,null);
+    },600);
+}
+function cbReset(){
+    window._cbShowReported=false;
+    document.getElementById('cbBubble').style.opacity='1';
+    document.getElementById('cbArrow').style.opacity='0';
+    document.getElementById('cbReported').style.opacity='0';
+    var m=window._cbMovies[window._cbIdx];
+    document.getElementById('cbSpeaker').textContent=m.speaker+' says:';
+    document.getElementById('cbReportBtn').disabled=false;
+}
+function cbSpeak(){
+    var m=window._cbMovies[window._cbIdx];
+    speak(window._cbShowReported?m.reported:m.direct,null);
+}
+
+
+// ===== SURVIVAL MODE =====
+let survInterval,survTimeout,survLives,survScore,survCombo,survSpeed,survActive,survBest;
+function startSurvival(){
+    survLives=3;survScore=0;survCombo=0;survSpeed=3500;survActive=true;
+    survBest=parseInt(localStorage.getItem('survBest')||'0');
+    openGameModal('☄️ Survival Mode','Bấm đúng nghĩa trước khi từ chạm đáy!');
+    // Build arena
+    let stars='<div class="surv-stars">';
+    for(let i=0;i<30;i++){stars+=`<div class="surv-star" style="left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*2}s;animation-duration:${1+Math.random()*2}s"></div>`}
+    stars+='</div>';
+    document.getElementById('gameContainer').innerHTML=`
+        <div class="surv-arena" id="survArena">${stars}
+            <div class="surv-hud">
+                <div class="surv-hearts" id="survHearts">❤️❤️❤️</div>
+                <div><div class="surv-score-display">⭐ <span id="survScoreDisplay">0</span></div>
+                <div class="surv-combo-display" id="survComboDisplay"></div></div>
+            </div>
+            <div class="surv-ground"></div>
+        </div>
+        <div class="surv-opts" id="survOpts"></div>`;
+    setTimeout(()=>survNextWord(),800);
+}
+function survNextWord(){
+    if(!survActive)return;
+    const allV=[];Object.values(vocabularyData).forEach(a=>a.forEach(v=>allV.push(v)));
+    const correct=allV[Math.floor(Math.random()*allV.length)];
+    // Pick 3 wrong answers
+    const wrongs=allV.filter(v=>v.word!==correct.word).sort(()=>Math.random()-.5).slice(0,3);
+    const opts=[{meaning:correct.meaning,correct:true},...wrongs.map(w=>({meaning:w.meaning,correct:false}))].sort(()=>Math.random()-.5);
+    
+    // Create falling word
+    const arena=document.getElementById('survArena');
+    const existing=arena.querySelector('.surv-word');
+    if(existing)existing.remove();
+    
+    const wordEl=document.createElement('div');
+    wordEl.className='surv-word';
+    wordEl.textContent=correct.word;
+    wordEl.style.top='40px';
+    arena.appendChild(wordEl);
+    
+    // Render options
+    const optsEl=document.getElementById('survOpts');
+    optsEl.innerHTML=opts.map((o,i)=>`<div class="surv-opt" onclick="survAnswer(${o.correct?1:0},this)">${o.meaning}</div>`).join('');
+    
+    // Animate falling
+    let pos=40;const arenaH=arena.offsetHeight-40;
+    const fallSpeed=(arenaH-40)/(survSpeed/16);
+    clearInterval(survInterval);
+    survInterval=setInterval(()=>{
+        if(!survActive){clearInterval(survInterval);return}
+        pos+=fallSpeed;
+        wordEl.style.top=pos+'px';
+        if(pos>=arenaH-30){
+            clearInterval(survInterval);
+            survMiss(wordEl);
+        }
+    },16);
+    
+    window._survWordEl=wordEl;
+    window._survCorrectWord=correct;
+}
+function survAnswer(isCorrect,btn){
+    if(!survActive)return;
+    clearInterval(survInterval);
+    const wordEl=window._survWordEl;
+    const allBtns=document.querySelectorAll('.surv-opt');
+    allBtns.forEach(b=>b.style.pointerEvents='none');
+    
+    if(isCorrect){
+        survScore++;survCombo++;
+        playCorrectSound();
+        btn.classList.add('surv-opt-correct');
+        if(wordEl)wordEl.classList.add('surv-hit');
+        document.getElementById('survScoreDisplay').textContent=survScore;
+        
+        // Combo display
+        const cd=document.getElementById('survComboDisplay');
+        if(survCombo>=3)cd.textContent='🔥 '+survCombo+'x Combo!';
+        else cd.textContent='';
+        
+        // Particles from word
+        if(wordEl){const r=wordEl.getBoundingClientRect();spawnParticles(r.left+r.width/2,r.top+r.height/2)}
+        
+        // Speed up every 5 words
+        if(survScore%5===0&&survSpeed>1200)survSpeed-=200;
+        
+        // Emoji rain at milestones
+        if(survScore===10)spawnEmojiRain(['⭐','✨'],10);
+        if(survScore===20)spawnEmojiRain(['🔥','⭐','💫'],15);
+        if(survScore===30){spawnEmojiRain(['🏆','👑','💎'],20);spawnConfetti()}
+        
+        setTimeout(()=>survNextWord(),600);
+    }else{
+        survCombo=0;
+        document.getElementById('survComboDisplay').textContent='';
+        playWrongSound();
+        btn.classList.add('surv-opt-wrong');
+        if(wordEl)wordEl.classList.add('surv-miss');
+        survLives--;
+        updateSurvHearts();
+        if(survLives<=0){setTimeout(()=>survGameOver(),500);return}
+        setTimeout(()=>survNextWord(),800);
+    }
+}
+function survMiss(wordEl){
+    if(!survActive)return;
+    survCombo=0;
+    document.getElementById('survComboDisplay').textContent='';
+    playWrongSound();
+    if(wordEl)wordEl.classList.add('surv-miss');
+    survLives--;
+    updateSurvHearts();
+    if(survLives<=0){setTimeout(()=>survGameOver(),500);return}
+    setTimeout(()=>survNextWord(),800);
+}
+function updateSurvHearts(){
+    const h=document.getElementById('survHearts');
+    if(h)h.textContent='❤️'.repeat(Math.max(0,survLives))+'🖤'.repeat(Math.max(0,3-survLives));
+}
+function survGameOver(){
+    survActive=false;clearInterval(survInterval);
+    if(survScore>survBest){survBest=survScore;localStorage.setItem('survBest',survBest)}
+    const xpEarned=survScore*8;
+    addXP(xpEarned,'Survival Mode');
+    
+    let emoji='💀',msg='Thử lại nhé!';
+    if(survScore>=30){emoji='🏆';msg='Huyền thoại!';spawnConfetti();spawnEmojiRain(['🏆','👑','💎'],25)}
+    else if(survScore>=20){emoji='🎉';msg='Xuất sắc!';spawnConfetti()}
+    else if(survScore>=10){emoji='⭐';msg='Tốt lắm!'}
+    else if(survScore>=5){emoji='👍';msg='Khá lắm!'}
+    
+    document.getElementById('gameContainer').innerHTML=`
+        <div class="surv-gameover">
+            <div class="go-emoji">${emoji}</div>
+            <h3>Game Over!</h3>
+            <div class="go-score">${survScore} điểm</div>
+            <p style="font-weight:800;color:var(--primary);font-size:1rem">+${xpEarned} XP</p>
+            <p class="go-best">🏆 Kỷ lục: ${survBest} điểm</p>
+            <p style="font-weight:700;font-size:.85rem;color:var(--text-light);margin-top:5px">${msg}</p>
+        </div>
+        <div class="quiz-nav">
+            <button class="quiz-btn secondary" onclick="closeGameModal()">🏠 Đóng</button>
+            <button class="quiz-btn primary" onclick="startSurvival()">🔄 Chơi lại</button>
+        </div>`;
+}
+
 // ===== GAME MODAL =====
-function closeGameModal(){document.getElementById('gameModal').classList.remove('active');stopSpeech()}
+function closeGameModal(){document.getElementById('gameModal').classList.remove('active');survActive=false;clearInterval(survInterval);stopSpeech()}
 function openGameModal(title,sub){document.getElementById('gameTitle').textContent=title;document.getElementById('gameSub').textContent=sub;document.getElementById('gameModal').classList.add('active')}
 
 // ===== FILL IN THE BLANK =====
@@ -2223,6 +3478,9 @@ function flipMemCard(i){
 
 // ===== PWA =====
 let deferredPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e});
+
+// ===== INIT =====
+updateXPBar();checkAchievements(true);
 </script>
 </body>
 </html>
