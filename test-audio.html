@@ -1,139 +1,90 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🔊 Test Âm Thanh</title>
-<script src="https://code.responsivevoice.org/responsivevoice.js?key=pVAluRyih"></script>
+<title>🔊 Test v2</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;padding:20px;background:#1a1a2e;color:#fff;min-height:100vh}
-h2{text-align:center;margin-bottom:20px;font-size:1.3rem}
-.test-btn{display:block;width:100%;padding:18px;margin:10px 0;border:none;border-radius:12px;font-size:1rem;font-weight:bold;cursor:pointer;color:#fff;text-align:left}
-.b1{background:#e74c3c}.b2{background:#3498db}.b3{background:#2ecc71}.b4{background:#f39c12}
-.status{font-size:.85rem;color:#aaa;margin:5px 0 15px 0;min-height:20px}
-.result{padding:10px;border-radius:8px;margin:5px 0;font-size:.9rem;display:none}
-.ok{background:#2ecc71;display:block}.fail{background:#e74c3c;display:block}
-#log{background:#111;padding:15px;border-radius:10px;margin-top:20px;font-size:.8rem;color:#0f0;max-height:200px;overflow-y:auto;white-space:pre-wrap}
+body{font-family:Arial,sans-serif;padding:20px;background:#1a1a2e;color:#fff}
+h2{text-align:center;margin-bottom:15px}
+.btn{display:block;width:100%;padding:16px;margin:8px 0;border:none;border-radius:12px;font-size:.95rem;font-weight:bold;cursor:pointer;color:#fff}
+.b1{background:#e74c3c}.b2{background:#3498db}.b3{background:#2ecc71}.b4{background:#f39c12}.b5{background:#9b59b6}
+.st{font-size:.85rem;color:#aaa;margin:3px 0 10px 0}
+#log{background:#111;padding:12px;border-radius:10px;margin-top:15px;font-size:.75rem;color:#0f0;max-height:250px;overflow-y:auto;white-space:pre-wrap}
 </style></head><body>
-<h2>🔊 Test Âm Thanh Trên Điện Thoại</h2>
-<p style="text-align:center;color:#aaa;margin-bottom:20px;font-size:.9rem">Bấm từng nút để test. Nút nào phát được tiếng = ✅</p>
+<h2>🔊 Test Âm Thanh v2</h2>
+<p style="text-align:center;color:#aaa;margin-bottom:15px;font-size:.85rem">Bấm từng nút, nút nào có tiếng = ✅</p>
 
-<button class="test-btn b1" onclick="test1(this)">1️⃣ Test speechSynthesis (có sẵn trong trình duyệt)</button>
-<div class="status" id="s1">Chưa test</div>
+<button class="btn b1" onclick="t1()">1️⃣ Web Audio Beep (tạo âm thanh trực tiếp)</button>
+<div class="st" id="s1">Chưa test</div>
 
-<button class="test-btn b2" onclick="test2(this)">2️⃣ Test ResponsiveVoice (thư viện bên ngoài)</button>
-<div class="status" id="s2">Chưa test</div>
+<button class="btn b2" onclick="t2()">2️⃣ VoiceRSS API</button>
+<div class="st" id="s2">Chưa test</div>
 
-<button class="test-btn b3" onclick="test3(this)">3️⃣ Test Google Translate TTS (audio file)</button>
-<div class="status" id="s3">Chưa test</div>
+<button class="btn b3" onclick="t3()">3️⃣ StreamElements TTS</button>
+<div class="st" id="s3">Chưa test</div>
 
-<button class="test-btn b4" onclick="test4(this)">4️⃣ Test Audio Unlock + speechSynthesis</button>
-<div class="status" id="s4">Chưa test</div>
+<button class="btn b4" onclick="t4()">4️⃣ ResponsiveVoice Direct URL</button>
+<div class="st" id="s4">Chưa test</div>
 
-<div id="log">📋 Log:\n</div>
+<button class="btn b5" onclick="t5()">5️⃣ Oddcast TTS</button>
+<div class="st" id="s5">Chưa test</div>
+
+<div id="log">Log:\n</div>
 
 <script>
-var log=document.getElementById('log');
-function addLog(msg){log.textContent+=msg+'\n';log.scrollTop=log.scrollHeight}
+var L=document.getElementById('log');
+function lg(m){L.textContent+=m+'\n';L.scrollTop=L.scrollHeight}
+function ss(id,ok,msg){document.getElementById(id).textContent=(ok?'✅ ':'❌ ')+msg}
+lg('UA: '+navigator.userAgent.substring(0,60));
 
-// Info
-addLog('User Agent: '+navigator.userAgent.substring(0,80));
-addLog('speechSynthesis: '+('speechSynthesis' in window));
-addLog('ResponsiveVoice: '+(typeof responsiveVoice!=='undefined'));
-setTimeout(function(){addLog('RV after 3s: '+(typeof responsiveVoice!=='undefined'))},3000);
-
-// Test 1: Raw speechSynthesis
-function test1(btn){
-    var s=document.getElementById('s1');
-    if(!('speechSynthesis' in window)){s.textContent='❌ Trình duyệt không hỗ trợ speechSynthesis';addLog('Test1: NO speechSynthesis');return}
-    try{
-        window.speechSynthesis.cancel();
-        var u=new SpeechSynthesisUtterance('Hello, this is a test of speech synthesis');
-        u.lang='en-US';u.rate=0.9;u.volume=1;
-        var voices=window.speechSynthesis.getVoices();
-        addLog('Test1: voices='+voices.length);
-        u.onend=function(){s.textContent='✅ Phát thành công!';addLog('Test1: SUCCESS')};
-        u.onerror=function(e){s.textContent='❌ Lỗi: '+e.error;addLog('Test1: ERROR '+e.error)};
-        window.speechSynthesis.speak(u);
-        s.textContent='⏳ Đang phát...';
-        addLog('Test1: speaking...');
-    }catch(e){s.textContent='❌ Exception: '+e.message;addLog('Test1: EXCEPTION '+e.message)}
+function playUrl(url,sid,name){
+    ss(sid,false,'Đang tải...');lg(name+': loading...');
+    var a=new Audio(url);
+    a.oncanplaythrough=function(){lg(name+': can play, starting...');a.play()};
+    a.onended=function(){ss(sid,true,name+' works!');lg(name+': SUCCESS')};
+    a.onerror=function(e){ss(sid,false,'Không tải được');lg(name+': LOAD ERROR')};
+    a.load();
+    var p=a.play();
+    if(p)p.then(function(){lg(name+': play() OK')}).catch(function(e){
+        ss(sid,false,'Play blocked: '+e.message);lg(name+': BLOCKED - '+e.message);
+    });
 }
 
-// Test 2: ResponsiveVoice
-function test2(btn){
-    var s=document.getElementById('s2');
-    if(typeof responsiveVoice==='undefined'){s.textContent='❌ ResponsiveVoice chưa tải xong, đợi 3s rồi thử lại';addLog('Test2: RV not loaded');return}
-    try{
-        responsiveVoice.speak('Hello, this is a test of responsive voice','US English Female',{
-            rate:0.9,
-            onend:function(){s.textContent='✅ Phát thành công!';addLog('Test2: SUCCESS')},
-            onerror:function(){s.textContent='❌ ResponsiveVoice lỗi';addLog('Test2: ERROR')}
-        });
-        s.textContent='⏳ Đang phát...';
-        addLog('Test2: speaking...');
-    }catch(e){s.textContent='❌ Exception: '+e.message;addLog('Test2: EXCEPTION '+e.message)}
-}
-
-// Test 3: Google Translate TTS
-function test3(btn){
-    var s=document.getElementById('s3');
-    try{
-        var url='https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=Hello+this+is+a+test+of+Google+Translate';
-        var audio=new Audio(url);
-        audio.onended=function(){s.textContent='✅ Phát thành công!';addLog('Test3: SUCCESS')};
-        audio.onerror=function(){s.textContent='❌ Không tải được audio';addLog('Test3: ERROR loading')};
-        var p=audio.play();
-        if(p)p.then(function(){addLog('Test3: play() OK')}).catch(function(e){s.textContent='❌ Play bị chặn: '+e.message;addLog('Test3: BLOCKED '+e.message)});
-        s.textContent='⏳ Đang phát...';
-        addLog('Test3: playing...');
-    }catch(e){s.textContent='❌ Exception: '+e.message;addLog('Test3: EXCEPTION '+e.message)}
-}
-
-// Test 4: Unlock audio first, then speechSynthesis
-function test4(btn){
-    var s=document.getElementById('s4');
-    addLog('Test4: Unlocking audio...');
-    // Unlock with AudioContext
+// Test 1: Web Audio API beep (generates sound locally, no network needed)
+function t1(){
+    ss('s1',false,'Đang tạo âm thanh...');lg('T1: Web Audio beep...');
     try{
         var ctx=new(window.AudioContext||window.webkitAudioContext)();
-        var buf=ctx.createBuffer(1,1,22050);
-        var src=ctx.createBufferSource();
-        src.buffer=buf;src.connect(ctx.destination);
-        if(src.start)src.start(0);else src.noteOn(0);
-        addLog('Test4: AudioContext unlocked');
-    }catch(e){addLog('Test4: AudioContext fail: '+e.message)}
-    
-    // Unlock speechSynthesis with empty utterance
-    if('speechSynthesis' in window){
-        try{
-            var empty=new SpeechSynthesisUtterance('');
-            empty.volume=0;
-            window.speechSynthesis.speak(empty);
-            addLog('Test4: speechSynthesis unlocked');
-        }catch(e){addLog('Test4: SS unlock fail')}
-    }
-    
-    // Now try speaking after short delay
-    setTimeout(function(){
-        if(!('speechSynthesis' in window)){s.textContent='❌ Không hỗ trợ';return}
-        try{
-            window.speechSynthesis.cancel();
-            var u=new SpeechSynthesisUtterance('This is test four with audio unlock first');
-            u.lang='en-US';u.rate=0.9;u.volume=1;
-            u.onend=function(){s.textContent='✅ Phát thành công sau unlock!';addLog('Test4: SUCCESS')};
-            u.onerror=function(e){s.textContent='❌ Lỗi: '+(e.error||'unknown');addLog('Test4: ERROR')};
-            window.speechSynthesis.speak(u);
-            s.textContent='⏳ Đang phát sau unlock...';
-            addLog('Test4: speaking after unlock...');
-        }catch(e){s.textContent='❌ '+e.message;addLog('Test4: EXCEPTION')}
-    },300);
+        var osc=ctx.createOscillator();
+        var gain=ctx.createGain();
+        osc.connect(gain);gain.connect(ctx.destination);
+        osc.frequency.value=440;
+        gain.gain.value=0.3;
+        osc.start(0);
+        setTimeout(function(){
+            osc.stop();ctx.close();
+            ss('s1',true,'Beep thành công! Web Audio hoạt động');lg('T1: SUCCESS');
+        },800);
+        ss('s1',false,'Đang phát beep...');
+    }catch(e){ss('s1',false,'Lỗi: '+e.message);lg('T1: ERROR '+e.message)}
 }
 
-// Pre-load voices
-if('speechSynthesis' in window){
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged=function(){
-        var v=window.speechSynthesis.getVoices();
-        addLog('Voices loaded: '+v.length);
-    }
+// Test 2: VoiceRSS
+function t2(){
+    playUrl('https://api.voicerss.org/?key=c3ccc7ce25c44358b4e0e8bad8db4e4b&hl=en-us&src=Hello+this+is+a+voice+test&c=MP3','s2','VoiceRSS');
+}
+
+// Test 3: StreamElements TTS
+function t3(){
+    playUrl('https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=Hello+this+is+a+stream+elements+test','s3','StreamElements');
+}
+
+// Test 4: ResponsiveVoice direct audio URL
+function t4(){
+    playUrl('https://texttospeech.responsivevoice.org/v1/text:synthesize?text=Hello+this+is+responsive+voice+direct&lang=en&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=pVAluRyih','s4','RV-Direct');
+}
+
+// Test 5: Oddcast
+function t5(){
+    playUrl('https://cache-a.oddcast.com/tts/genB.php?EID=2&LID=1&VID=2&TXT=Hello+this+is+a+test&IS_UTF8=1&ACC=3314795&API=2292376&SESSION=default','s5','Oddcast');
 }
 </script></body></html>
